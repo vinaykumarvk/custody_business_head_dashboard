@@ -13,9 +13,10 @@ import {
   monthlyCustomerData, type MonthlyCustomerData, type InsertMonthlyCustomerData,
   customerHistory, type CustomerHistory, type InsertCustomerHistory
 } from "@shared/schema";
-import { eq, desc } from 'drizzle-orm';
+import { eq, desc, asc } from 'drizzle-orm';
 import { drizzle } from 'drizzle-orm/postgres-js';
 import postgres from 'postgres';
+import { format } from 'date-fns';
 
 // Create postgres client
 const connectionString = process.env.DATABASE_URL || 'postgres://postgres:postgres@localhost:5432/postgres';
@@ -1525,24 +1526,199 @@ export class DatabaseStorage implements IStorage {
       .returning();
     return user;
   }
-  
-  // All other methods are already implemented in PostgresStorage
-  // We're keeping the PostgresStorage implementation for now and will gradually migrate to this cleaner approach
+
+  async getCustomerMetrics(): Promise<CustomerMetrics | undefined> {
+    const [metrics] = await db.select().from(customerMetrics);
+    return metrics || undefined;
+  }
+
+  async getCustomerGrowth(): Promise<CustomerGrowth[]> {
+    // Get the customer growth data ordered by date
+    const result = await db.select().from(customerGrowth).orderBy(asc(customerGrowth.date));
+    
+    // Log the retrieved data for debugging
+    console.log("Retrieved customer growth data: " + result.map(r => 
+      `${format(r.date, 'yyyy-MM-dd')}: Total=${r.totalCustomers}, New=${r.newCustomers}`
+    ).join("\n"));
+    
+    return result;
+  }
+
+  async getCustomerSegments(): Promise<CustomerSegments[]> {
+    return db.select().from(customerSegments);
+  }
+
+  async getTradingVolume(): Promise<TradingVolume[]> {
+    return db.select().from(tradingVolume).orderBy(asc(tradingVolume.date));
+  }
+
+  async getAucHistory(): Promise<AucHistory[]> {
+    return db.select().from(aucHistory).orderBy(asc(aucHistory.date));
+  }
+
+  async getAucMetrics(): Promise<AucMetrics | undefined> {
+    const [metrics] = await db.select().from(aucMetrics);
+    return metrics || undefined;
+  }
+
+  async getIncome(): Promise<Income | undefined> {
+    const [income] = await db.select().from(income);
+    return income || undefined;
+  }
+
+  async getIncomeByService(): Promise<IncomeByService[]> {
+    return db.select().from(incomeByService);
+  }
+
+  async getIncomeHistory(): Promise<IncomeHistory[]> {
+    return db.select().from(incomeHistory).orderBy(asc(incomeHistory.date));
+  }
+
+  async getTopCustomers(): Promise<TopCustomers[]> {
+    return db.select().from(topCustomers);
+  }
+
+  async getMonthlyCustomerData(): Promise<MonthlyCustomerData[]> {
+    return db.select().from(monthlyCustomerData).orderBy(asc(monthlyCustomerData.date));
+  }
+
+  async createMonthlyCustomerData(data: InsertMonthlyCustomerData): Promise<MonthlyCustomerData> {
+    const [result] = await db.insert(monthlyCustomerData).values(data).returning();
+    return result;
+  }
+
+  async getCustomerHistory(): Promise<CustomerHistory[]> {
+    return db.select().from(customerHistory).orderBy(asc(customerHistory.date));
+  }
+
+  async createCustomerHistory(data: InsertCustomerHistory): Promise<CustomerHistory> {
+    const [result] = await db.insert(customerHistory).values(data).returning();
+    return result;
+  }
+
+  async calculateDerivedCustomerMetrics(dataPoints: MonthlyCustomerData[]): Promise<CustomerMetrics> {
+    if (dataPoints.length === 0) {
+      // Return default metrics if no data points
+      return {
+        id: 1,
+        totalCustomers: 0,
+        activeCustomers: 0,
+        newCustomersMTD: 0,
+        retentionRate: '0%',
+        churnRate: '0%',
+        lifetimeValue: '$0',
+        acquisitionCost: '$0',
+        date: new Date()
+      };
+    }
+
+    // Sort dataPoints by date in ascending order
+    dataPoints.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+    
+    // Get the latest data point
+    const latest = dataPoints[dataPoints.length - 1];
+    
+    // Get the previous month's data point if available
+    const previousMonth = dataPoints.length > 1 ? dataPoints[dataPoints.length - 2] : null;
+    
+    // Calculate new customers MTD (month-to-date)
+    const newCustomersMTD = latest.newCustomers || 0;
+    
+    // Calculate total customers
+    const totalCustomers = latest.totalCustomers;
+    
+    // Calculate active customers (75-85% of total customers)
+    const activeCustomers = Math.round(totalCustomers * 0.8);
+    
+    // Calculate retention rate
+    let retentionRate = '95%';
+    if (previousMonth) {
+      const prevTotal = previousMonth.totalCustomers - previousMonth.newCustomers;
+      const retained = Math.min(totalCustomers - newCustomersMTD, prevTotal);
+      retentionRate = prevTotal > 0 ? `${Math.round((retained / prevTotal) * 100)}%` : '100%';
+    }
+    
+    // Calculate churn rate
+    const churnRate = `${100 - parseInt(retentionRate)}%`;
+    
+    // Generate sample lifetime value and acquisition cost
+    const lifetimeValue = '$25,000';
+    const acquisitionCost = '$5,200';
+    
+    return {
+      id: 1,
+      totalCustomers,
+      activeCustomers,
+      newCustomersMTD,
+      retentionRate,
+      churnRate,
+      lifetimeValue,
+      acquisitionCost,
+      date: new Date(latest.date)
+    };
+  }
+
+  async calculateCustomerGrowth(dataPoints: MonthlyCustomerData[]): Promise<CustomerGrowth[]> {
+    if (dataPoints.length === 0) {
+      return [];
+    }
+    
+    // Sort by date
+    dataPoints.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+    
+    // Map to CustomerGrowth format
+    return dataPoints.map((point, index) => {
+      return {
+        id: index + 1,
+        date: new Date(point.date),
+        totalCustomers: point.totalCustomers,
+        newCustomers: point.newCustomers
+      };
+    });
+  }
+
+  async calculateCustomerSegments(dataPoint: MonthlyCustomerData): Promise<CustomerSegments[]> {
+    // Get the customer segments from the data point
+    const institutional = dataPoint.institutional || 0;
+    const corporate = dataPoint.corporate || 0;
+    const hni = dataPoint.hni || 0;
+    const funds = dataPoint.funds || 0;
+    
+    const total = institutional + corporate + hni + funds;
+    
+    // Format as percentage strings
+    const institutionalPct = total > 0 ? `${Math.round((institutional / total) * 100)}%` : '0%';
+    const corporatePct = total > 0 ? `${Math.round((corporate / total) * 100)}%` : '0%';
+    const hniPct = total > 0 ? `${Math.round((hni / total) * 100)}%` : '0%';
+    const fundsPct = total > 0 ? `${Math.round((funds / total) * 100)}%` : '0%';
+    
+    return [
+      { id: 1, segmentName: 'Institutional', percentage: institutionalPct },
+      { id: 2, segmentName: 'Corporate', percentage: corporatePct },
+      { id: 3, segmentName: 'HNI', percentage: hniPct },
+      { id: 4, segmentName: 'Funds', percentage: fundsPct }
+    ];
+  }
+
+  async seedDatabase(): Promise<void> {
+    // No need to implement seeding if we're using the existing database
+    console.log("Using database storage, seeding not needed");
+  }
 }
 
-// First try to use PostgresStorage, fallback to MemStorage if there's an issue
+// First try to use DatabaseStorage, fallback to MemStorage if there's an issue
 let storage: IStorage;
 try {
   // Test database connection
-  storage = new PostgresStorage();
-  console.log("Using PostgreSQL storage");
+  storage = new DatabaseStorage();
+  console.log("Using Database storage with Drizzle ORM");
   
-  // Seed the database
+  // Seed the database if needed
   storage.seedDatabase().catch(err => {
     console.error("Error seeding database:", err);
   });
 } catch (error) {
-  console.error("Failed to initialize PostgreSQL storage, falling back to memory storage", error);
+  console.error("Failed to initialize Database storage, falling back to memory storage", error);
   storage = new MemStorage();
 }
 
