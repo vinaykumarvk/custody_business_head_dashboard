@@ -47,8 +47,8 @@ const TradingVolumeChart: React.FC<TradingVolumeChartProps> = ({ data }) => {
 
     // Calculate gradient
     const gradient = ctx.createLinearGradient(0, 0, 0, 400);
-    gradient.addColorStop(0, 'rgba(36, 72, 165, 0.4)');
-    gradient.addColorStop(1, 'rgba(36, 72, 165, 0.0)');
+    gradient.addColorStop(0, 'rgba(59, 130, 246, 0.6)');  // Brighter blue with higher opacity
+    gradient.addColorStop(1, 'rgba(59, 130, 246, 0.05)');
 
     chartInstance.current = new Chart(ctx, {
       type: 'line',
@@ -57,13 +57,13 @@ const TradingVolumeChart: React.FC<TradingVolumeChartProps> = ({ data }) => {
         datasets: [{
           label: 'Trading Volume (in billions USD)',
           data: volumes,
-          borderColor: '#2448a5',
+          borderColor: '#3B82F6',
           backgroundColor: gradient,
-          borderWidth: 2,
+          borderWidth: 4,  // Thicker line
           tension: 0.4,
           fill: true,
-          pointBackgroundColor: '#2448a5',
-          pointRadius: 3
+          pointBackgroundColor: '#3B82F6',
+          pointRadius: 0  // Remove points
         }]
       },
       options: {

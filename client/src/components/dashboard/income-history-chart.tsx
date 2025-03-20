@@ -47,8 +47,8 @@ const IncomeHistoryChart: React.FC<IncomeHistoryChartProps> = ({ data }) => {
 
     // Create gradient fill
     const gradient = ctx.createLinearGradient(0, 0, 0, 250);
-    gradient.addColorStop(0, 'rgba(36, 72, 165, 0.7)');
-    gradient.addColorStop(1, 'rgba(36, 72, 165, 0.0)');
+    gradient.addColorStop(0, 'rgba(76, 175, 80, 0.9)');  // Green with higher opacity
+    gradient.addColorStop(1, 'rgba(76, 175, 80, 0.1)');
 
     chartInstance.current = new Chart(ctx, {
       type: 'bar',
@@ -58,8 +58,8 @@ const IncomeHistoryChart: React.FC<IncomeHistoryChartProps> = ({ data }) => {
           label: 'Income (in millions USD)',
           data: amounts,
           backgroundColor: gradient,
-          borderColor: '#2448a5',
-          borderWidth: 1,
+          borderColor: '#4CAF50',
+          borderWidth: 2,
           borderRadius: 4,
           barPercentage: 0.6
         }]
