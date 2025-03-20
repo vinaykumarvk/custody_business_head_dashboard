@@ -34,7 +34,7 @@ const MetricCard: React.FC<MetricCardProps> = ({
             <div className="flex items-center mt-2">
               <span className={`text-sm font-medium flex items-center ${isPositive ? 'text-green-600' : 'text-red-600'} font-roboto`}>
                 <i className={`ri-arrow-${isPositive ? 'up' : 'down'}-line mr-1`}></i>
-                {Math.abs(change)}%
+                {isPositive ? '' : '('}{Math.abs(change)}%{isPositive ? '' : ')'}
               </span>
               <span className="text-xs text-custodyGray ml-2 font-roboto">vs last month</span>
             </div>
