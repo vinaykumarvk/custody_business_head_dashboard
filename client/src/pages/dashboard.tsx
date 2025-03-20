@@ -14,54 +14,129 @@ import IncomeHistoryChart from '@/components/dashboard/income-history-chart';
 import IncomeByServiceChart from '@/components/dashboard/income-by-service-chart';
 import TopCustomersTable from '@/components/dashboard/top-customers-table';
 
+// Interface definitions for API responses
+interface CustomerMetricsData {
+  id: number;
+  totalCustomers: number;
+  activeCustomers: number;
+  newCustomersMTD: number;
+  date: string;
+}
+
+interface CustomerGrowthData {
+  id: number;
+  date: string;
+  totalCustomers: number;
+  newCustomers: number;
+}
+
+interface CustomerSegment {
+  id: number;
+  segmentName: string;
+  percentage: string;
+}
+
+interface TradingVolumeData {
+  id: number;
+  date: string;
+  volume: string;
+}
+
+interface AucHistoryData {
+  id: number;
+  date: string;
+  equity: string;
+  fixedIncome: string;
+  mutualFunds: string;
+  others: string;
+}
+
+interface AucMetricsData {
+  id: number;
+  totalAuc: string;
+  equity: string;
+  fixedIncome: string;
+  mutualFunds: string;
+  others: string;
+  growth: string;
+}
+
+interface IncomeData {
+  id: number;
+  incomeMTD: string;
+  outstandingFees: string;
+  growth: string;
+}
+
+interface IncomeHistoryData {
+  id: number;
+  date: string;
+  amount: string;
+}
+
+interface IncomeByService {
+  id: number;
+  serviceName: string;
+  amount: string;
+}
+
+interface TopCustomer {
+  id: number;
+  name: string;
+  customerType: string;
+  revenue: string;
+  assets: string;
+  changePercent: string;
+}
+
 export default function Dashboard() {
   // Customer Metrics
-  const { data: customerMetrics, isLoading: customerMetricsLoading, error: customerMetricsError } = useQuery({
+  const { data: customerMetrics, isLoading: customerMetricsLoading, error: customerMetricsError } = useQuery<CustomerMetricsData>({
     queryKey: ['/api/customer-metrics'],
   });
 
   // Customer Growth
-  const { data: customerGrowth, isLoading: customerGrowthLoading, error: customerGrowthError } = useQuery({
+  const { data: customerGrowth, isLoading: customerGrowthLoading, error: customerGrowthError } = useQuery<CustomerGrowthData[]>({
     queryKey: ['/api/customer-growth'],
   });
 
   // Customer Segments
-  const { data: customerSegments, isLoading: customerSegmentsLoading, error: customerSegmentsError } = useQuery({
+  const { data: customerSegments, isLoading: customerSegmentsLoading, error: customerSegmentsError } = useQuery<CustomerSegment[]>({
     queryKey: ['/api/customer-segments'],
   });
 
   // Trading Volume
-  const { data: tradingVolume, isLoading: tradingVolumeLoading, error: tradingVolumeError } = useQuery({
+  const { data: tradingVolume, isLoading: tradingVolumeLoading, error: tradingVolumeError } = useQuery<TradingVolumeData[]>({
     queryKey: ['/api/trading-volume'],
   });
 
   // AUC History
-  const { data: aucHistory, isLoading: aucHistoryLoading, error: aucHistoryError } = useQuery({
+  const { data: aucHistory, isLoading: aucHistoryLoading, error: aucHistoryError } = useQuery<AucHistoryData[]>({
     queryKey: ['/api/auc-history'],
   });
 
   // AUC Metrics
-  const { data: aucMetrics, isLoading: aucMetricsLoading, error: aucMetricsError } = useQuery({
+  const { data: aucMetrics, isLoading: aucMetricsLoading, error: aucMetricsError } = useQuery<AucMetricsData>({
     queryKey: ['/api/auc-metrics'],
   });
 
   // Income data
-  const { data: income, isLoading: incomeLoading, error: incomeError } = useQuery({
+  const { data: income, isLoading: incomeLoading, error: incomeError } = useQuery<IncomeData>({
     queryKey: ['/api/income'],
   });
 
   // Income by Service
-  const { data: incomeByService, isLoading: incomeByServiceLoading, error: incomeByServiceError } = useQuery({
+  const { data: incomeByService, isLoading: incomeByServiceLoading, error: incomeByServiceError } = useQuery<IncomeByService[]>({
     queryKey: ['/api/income-by-service'],
   });
 
   // Income History
-  const { data: incomeHistory, isLoading: incomeHistoryLoading, error: incomeHistoryError } = useQuery({
+  const { data: incomeHistory, isLoading: incomeHistoryLoading, error: incomeHistoryError } = useQuery<IncomeHistoryData[]>({
     queryKey: ['/api/income-history'],
   });
 
   // Top Customers
-  const { data: topCustomers, isLoading: topCustomersLoading, error: topCustomersError } = useQuery({
+  const { data: topCustomers, isLoading: topCustomersLoading, error: topCustomersError } = useQuery<TopCustomer[]>({
     queryKey: ['/api/top-customers'],
   });
 

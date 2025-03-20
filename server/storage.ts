@@ -1233,6 +1233,30 @@ export class MemStorage implements IStorage {
   }
 }
 
+// Database Storage implementation following the blueprint
+export class DatabaseStorage implements IStorage {
+  async getUser(id: number): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.id, id));
+    return user || undefined;
+  }
+
+  async getUserByUsername(username: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.username, username));
+    return user || undefined;
+  }
+
+  async createUser(insertUser: InsertUser): Promise<User> {
+    const [user] = await db
+      .insert(users)
+      .values(insertUser)
+      .returning();
+    return user;
+  }
+  
+  // All other methods are already implemented in PostgresStorage
+  // We're keeping the PostgresStorage implementation for now and will gradually migrate to this cleaner approach
+}
+
 // First try to use PostgresStorage, fallback to MemStorage if there's an issue
 let storage: IStorage;
 try {
