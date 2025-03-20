@@ -56,7 +56,7 @@ const TradingVolumeChart: React.FC<TradingVolumeChartProps> = ({ data }) => {
       data: {
         labels: labels,
         datasets: [{
-          label: 'Trading Volume (in billions USD)',
+          label: 'Monthly Trading Volume',
           data: volumes,
           borderColor: '#3B82F6',
           backgroundColor: gradient,
@@ -91,7 +91,14 @@ const TradingVolumeChart: React.FC<TradingVolumeChartProps> = ({ data }) => {
         },
         plugins: {
           legend: {
-            display: false
+            display: true,
+            position: 'top',
+            align: 'end',
+            labels: {
+              usePointStyle: true,
+              pointStyle: 'line',
+              pointStyleWidth: 16 // Make the line longer in the legend
+            }
           },
           tooltip: {
             callbacks: {

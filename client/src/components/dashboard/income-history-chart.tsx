@@ -56,7 +56,7 @@ const IncomeHistoryChart: React.FC<IncomeHistoryChartProps> = ({ data }) => {
       data: {
         labels: labels,
         datasets: [{
-          label: 'Income (in millions USD)',
+          label: 'Monthly Income',
           data: amounts,
           backgroundColor: gradient,
           borderColor: '#4CAF50',
@@ -88,7 +88,14 @@ const IncomeHistoryChart: React.FC<IncomeHistoryChartProps> = ({ data }) => {
         },
         plugins: {
           legend: {
-            display: false
+            display: true,
+            position: 'top',
+            align: 'end',
+            labels: {
+              usePointStyle: true,
+              pointStyle: 'rectRounded',
+              pointStyleWidth: 16 // Maintain rectangular style for bar charts
+            }
           },
           tooltip: {
             callbacks: {

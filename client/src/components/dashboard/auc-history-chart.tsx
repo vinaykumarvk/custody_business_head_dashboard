@@ -118,7 +118,12 @@ const AucHistoryChart: React.FC<AucHistoryChartProps> = ({ data }) => {
         plugins: {
           legend: {
             position: 'top',
-            align: 'end'
+            align: 'end',
+            labels: {
+              usePointStyle: true,
+              pointStyle: 'rectRounded',
+              pointStyleWidth: 16 // Maintain rectangular style for bar charts
+            }
           },
           tooltip: {
             callbacks: {
