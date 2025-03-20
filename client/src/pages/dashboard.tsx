@@ -81,7 +81,7 @@ export default function Dashboard() {
 
   return (
     <div className="bg-custodyBackground min-h-screen font-roboto">
-      <div className="container mx-auto px-4 py-6">
+      <div className="container mx-auto px-4 py-4">
         {customerMetricsError && renderErrorAlert("Failed to load customer metrics")}
         {aucMetricsError && renderErrorAlert("Failed to load AUC metrics")}
         
@@ -89,7 +89,7 @@ export default function Dashboard() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 mb-6">
           {customerMetricsLoading || aucMetricsLoading ? (
             Array(4).fill(0).map((_, i) => (
-              <div key={i} className="bg-white rounded-lg shadow p-5">
+              <div key={i} className="bg-white rounded-md shadow-sm p-5">
                 <Skeleton className="h-5 w-32 mb-2" />
                 <Skeleton className="h-8 w-24 mb-2" />
                 <Skeleton className="h-4 w-32" />
@@ -131,18 +131,18 @@ export default function Dashboard() {
         {customerSegmentsError && renderErrorAlert("Failed to load customer segments data")}
         
         {/* Second row */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-          <div className="bg-white p-6 rounded-lg shadow col-span-2">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 mb-6">
+          <div className="bg-white p-5 rounded-md shadow-sm col-span-2">
             {customerGrowthLoading ? (
-              <div className="animate-pulse h-80 bg-gray-200 rounded"></div>
+              <div className="animate-pulse h-80 bg-gray-200 rounded-md"></div>
             ) : customerGrowth ? (
               <CustomerGrowthChart data={customerGrowth} />
             ) : null}
           </div>
           
-          <div className="bg-white p-6 rounded-lg shadow">
+          <div className="bg-white p-5 rounded-md shadow-sm">
             {customerSegmentsLoading ? (
-              <div className="animate-pulse h-60 bg-gray-200 rounded"></div>
+              <div className="animate-pulse h-60 bg-gray-200 rounded-md"></div>
             ) : customerSegments ? (
               <CustomerSegmentsChart data={customerSegments} />
             ) : null}
@@ -153,8 +153,8 @@ export default function Dashboard() {
         {aucHistoryError && renderErrorAlert("Failed to load AUC history data")}
         
         {/* Third row */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-          <div className="bg-white p-6 rounded-lg shadow">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 mb-6">
+          <div className="bg-white p-5 rounded-md shadow-sm">
             {tradingVolumeLoading ? (
               <div className="animate-pulse h-80 bg-gray-200 rounded"></div>
             ) : tradingVolume ? (
@@ -162,7 +162,7 @@ export default function Dashboard() {
             ) : null}
           </div>
           
-          <div className="bg-white p-6 rounded-lg shadow">
+          <div className="bg-white p-5 rounded-md shadow-sm">
             {aucHistoryLoading ? (
               <div className="animate-pulse h-80 bg-gray-200 rounded"></div>
             ) : aucHistory ? (
@@ -174,10 +174,10 @@ export default function Dashboard() {
         {incomeError && renderErrorAlert("Failed to load income data")}
         
         {/* Income Metrics */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 mb-6">
           {incomeLoading ? (
             Array(2).fill(0).map((_, i) => (
-              <div key={i} className="bg-white rounded-lg shadow p-5">
+              <div key={i} className="bg-white rounded-md shadow-sm p-5">
                 <Skeleton className="h-5 w-32 mb-2" />
                 <Skeleton className="h-8 w-24 mb-2" />
                 <Skeleton className="h-4 w-32" />
@@ -210,8 +210,8 @@ export default function Dashboard() {
         {incomeByServiceError && renderErrorAlert("Failed to load income by service data")}
         
         {/* Fourth row */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-          <div className="bg-white p-6 rounded-lg shadow col-span-2">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 mb-6">
+          <div className="bg-white p-5 rounded-md shadow-sm col-span-2">
             {incomeHistoryLoading ? (
               <div className="animate-pulse h-80 bg-gray-200 rounded"></div>
             ) : incomeHistory ? (
@@ -219,7 +219,7 @@ export default function Dashboard() {
             ) : null}
           </div>
           
-          <div className="bg-white p-6 rounded-lg shadow">
+          <div className="bg-white p-5 rounded-md shadow-sm">
             {incomeByServiceLoading ? (
               <div className="animate-pulse h-60 bg-gray-200 rounded"></div>
             ) : incomeByService ? (
@@ -231,7 +231,7 @@ export default function Dashboard() {
         {topCustomersError && renderErrorAlert("Failed to load top customers data")}
         
         {/* Top Customers Table */}
-        <div className="bg-white p-6 rounded-lg shadow mb-8">
+        <div className="bg-white p-5 rounded-md shadow-sm mb-6">
           {topCustomersLoading ? (
             <div className="animate-pulse h-80 bg-gray-200 rounded"></div>
           ) : topCustomers ? (
