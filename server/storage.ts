@@ -187,13 +187,18 @@ export class PostgresStorage implements IStorage {
   }
 
   async getAucMetrics(): Promise<AucMetrics | undefined> {
+    // First check if we have existing data in the database
+    const existingMetrics = await db.select().from(aucMetrics);
+    if (existingMetrics.length > 0) {
+      return existingMetrics[0];
+    }
+    
     // Get the AUC history data
     const aucHistoryData = await this.getAucHistory();
     
-    // If no history data, return from aucMetrics table (fallback)
+    // If no history data, return undefined
     if (aucHistoryData.length < 2) {
-      const result = await db.select().from(aucMetrics);
-      return result[0];
+      return undefined;
     }
     
     // Sort by date, most recent first
@@ -224,9 +229,8 @@ export class PostgresStorage implements IStorage {
     // Calculate growth rate
     const growthRate = ((totalLatest - totalPrevious) / totalPrevious) * 100;
     
-    // Return metrics based on latest AUC history data
-    return {
-      id: 1,
+    // Insert the calculated metrics into the database
+    const metricsToInsert = {
       totalAuc: totalLatest.toFixed(1),
       equity: latestEquity.toFixed(1),
       fixedIncome: latestFixedIncome.toFixed(1),
@@ -234,6 +238,9 @@ export class PostgresStorage implements IStorage {
       others: latestOthers.toFixed(1),
       growth: growthRate.toFixed(1)
     };
+    
+    const [insertedMetrics] = await db.insert(aucMetrics).values(metricsToInsert).returning();
+    return insertedMetrics;
   }
 
   async getIncome(): Promise<Income | undefined> {
@@ -559,7 +566,8 @@ export class PostgresStorage implements IStorage {
           equity: "48.2",
           fixedIncome: "38.1",
           mutualFunds: "10.2",
-          others: "8.0"
+          others: "8.0",
+          growth: "-0.9"
         });
       }
       
@@ -912,7 +920,8 @@ export class MemStorage implements IStorage {
       equity: "48.2",
       fixedIncome: "38.1",
       mutualFunds: "10.2",
-      others: "8.0"
+      others: "8.0",
+      growth: "-0.9"
     };
     this.inc = {
       id: 1,
