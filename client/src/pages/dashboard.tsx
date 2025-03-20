@@ -80,13 +80,13 @@ export default function Dashboard() {
   );
 
   return (
-    <div className="bg-[#F8FAFC] min-h-screen">
+    <div className="bg-custodyBackground min-h-screen font-roboto">
       <div className="container mx-auto px-4 py-6">
         {customerMetricsError && renderErrorAlert("Failed to load customer metrics")}
         {aucMetricsError && renderErrorAlert("Failed to load AUC metrics")}
         
         {/* Customer Metrics */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 mb-6">
           {customerMetricsLoading || aucMetricsLoading ? (
             Array(4).fill(0).map((_, i) => (
               <div key={i} className="bg-white rounded-lg shadow p-5">

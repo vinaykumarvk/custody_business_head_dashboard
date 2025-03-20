@@ -13,6 +13,11 @@ export default {
       colors: {
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
+        // Angular Custody Dashboard colors
+        custodyBlue: "#2448a5",
+        custodyLightBlue: "#C6DBFC",
+        custodyGray: "#7b7b7b",
+        custodyBackground: "#F8FAFC",
         card: {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
@@ -24,6 +29,9 @@ export default {
         primary: {
           DEFAULT: "hsl(var(--primary))",
           foreground: "hsl(var(--primary-foreground))",
+          // Angular-style primary colors
+          blue: "#2448a5",
+          light: "#C6DBFC",
         },
         secondary: {
           DEFAULT: "hsl(var(--secondary))",
@@ -45,11 +53,11 @@ export default {
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
         chart: {
-          "1": "hsl(var(--chart-1))",
-          "2": "hsl(var(--chart-2))",
-          "3": "hsl(var(--chart-3))",
-          "4": "hsl(var(--chart-4))",
-          "5": "hsl(var(--chart-5))",
+          "1": "#2448a5", // Primary blue
+          "2": "#C6DBFC", // Light blue
+          "3": "#7b7b7b", // Gray
+          "4": "#4a6cca", // Medium blue (derived)
+          "5": "#e2ecfd", // Very light blue (derived)
         },
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",

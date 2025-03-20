@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -7,7 +9,43 @@
     @apply border-border;
   }
 
+  :root {
+    --primary-color: #2448a5;
+    --primary-light: #C6DBFC;
+    --text-gray: #7b7b7b;
+  }
+
   body {
-    @apply font-sans antialiased bg-background text-foreground;
+    font-family: 'Roboto', sans-serif;
+    @apply antialiased bg-[#F8FAFC] text-gray-800;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Roboto', sans-serif;
+    font-weight: 500;
+  }
+  
+  .card {
+    @apply bg-white rounded-md shadow-sm;
+    border-radius: 4px;
+  }
+  
+  .chart-container {
+    @apply p-4 bg-white rounded-md shadow-sm;
+  }
+  
+  /* Match Angular Material button styling */
+  .btn-primary {
+    @apply bg-[#2448a5] text-white px-4 py-2 rounded;
+    font-family: 'Roboto', sans-serif;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+  }
+  
+  /* Match Angular Material input styling */
+  input, select, textarea {
+    @apply border border-gray-300 rounded px-3 py-2 outline-none focus:border-[#2448a5] w-full;
+    font-family: 'Roboto', sans-serif;
   }
 }
