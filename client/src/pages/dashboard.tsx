@@ -65,8 +65,10 @@ export default function Dashboard() {
     queryKey: ['/api/top-customers'],
   });
 
-  const formatNumberWithCommas = (value: number) => {
-    return value?.toLocaleString() || '';
+  const formatNumberWithCommas = (value: number | string | undefined) => {
+    if (value === undefined) return '';
+    const numValue = typeof value === 'string' ? parseInt(value) : value;
+    return numValue.toLocaleString() || '';
   };
 
   const renderErrorAlert = (message: string) => (
