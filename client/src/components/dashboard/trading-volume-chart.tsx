@@ -64,7 +64,11 @@ const TradingVolumeChart: React.FC<TradingVolumeChartProps> = ({ data }) => {
           tension: 0.4,
           fill: true,
           pointBackgroundColor: '#3B82F6',
-          pointRadius: 0  // Remove points
+          pointRadius: 0,  // Hide points by default
+          pointHoverRadius: 6,  // Show points on hover
+          pointHoverBackgroundColor: '#3B82F6',
+          pointHoverBorderColor: '#ffffff',
+          pointHoverBorderWidth: 2
         }]
       },
       options: {
@@ -89,6 +93,11 @@ const TradingVolumeChart: React.FC<TradingVolumeChartProps> = ({ data }) => {
             }
           }
         },
+        interaction: {
+          mode: 'nearest',
+          axis: 'x',
+          intersect: false
+        },
         plugins: {
           legend: {
             display: true,
@@ -101,6 +110,8 @@ const TradingVolumeChart: React.FC<TradingVolumeChartProps> = ({ data }) => {
             }
           },
           tooltip: {
+            mode: 'index',
+            intersect: false,
             callbacks: {
               label: function(context) {
                 return '$' + context.parsed.y + ' billion';

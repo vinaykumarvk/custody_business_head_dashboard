@@ -60,7 +60,11 @@ const CustomerGrowthChart: React.FC<CustomerGrowthChartProps> = ({ data }) => {
             borderWidth: 4,
             tension: 0.4,
             fill: false,
-            pointRadius: 0
+            pointRadius: 0,
+            pointHoverRadius: 6,
+            pointHoverBackgroundColor: '#2448a5',
+            pointHoverBorderColor: '#ffffff',
+            pointHoverBorderWidth: 2
           }
         ]
       },
@@ -95,7 +99,28 @@ const CustomerGrowthChart: React.FC<CustomerGrowthChartProps> = ({ data }) => {
               pointStyle: 'line',
               pointStyleWidth: 16 // Make the line longer in the legend
             }
+          },
+          tooltip: {
+            mode: 'index',
+            intersect: false,
+            callbacks: {
+              label: function(context) {
+                let label = context.dataset.label || '';
+                if (label) {
+                  label += ': ';
+                }
+                if (context.parsed.y !== null) {
+                  label += new Intl.NumberFormat('en-US').format(context.parsed.y);
+                }
+                return label;
+              }
+            }
           }
+        },
+        interaction: {
+          mode: 'nearest',
+          axis: 'x',
+          intersect: false
         }
       }
     });

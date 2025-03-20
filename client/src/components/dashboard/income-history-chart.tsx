@@ -98,9 +98,19 @@ const IncomeHistoryChart: React.FC<IncomeHistoryChartProps> = ({ data }) => {
             }
           },
           tooltip: {
+            mode: 'index',
+            intersect: false,
             callbacks: {
               label: function(context) {
-                return '$' + context.parsed.y.toFixed(2) + ' million';
+                let label = context.dataset.label || '';
+                if (label) {
+                  label += ': $';
+                }
+                label += context.parsed.y.toFixed(2) + ' million';
+                return label;
+              },
+              title: function(tooltipItems) {
+                return format(new Date(data[tooltipItems[0].dataIndex].date), 'MMMM yyyy');
               }
             }
           }

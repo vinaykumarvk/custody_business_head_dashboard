@@ -126,9 +126,24 @@ const AucHistoryChart: React.FC<AucHistoryChartProps> = ({ data }) => {
             }
           },
           tooltip: {
+            mode: 'index',
+            intersect: false,
             callbacks: {
               label: function(context) {
-                return context.dataset.label + ': $' + context.parsed.y + ' billion';
+                let label = context.dataset.label || '';
+                if (label) {
+                  label += ': $';
+                }
+                label += context.parsed.y + ' billion';
+                return label;
+              },
+              // Add footer to show total
+              footer: function(tooltipItems) {
+                let sum = 0;
+                tooltipItems.forEach(function(tooltipItem) {
+                  sum += tooltipItem.parsed.y;
+                });
+                return 'Total: $' + sum.toFixed(2) + ' billion';
               }
             }
           }
