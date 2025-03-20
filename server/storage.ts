@@ -748,7 +748,7 @@ export class MemStorage implements IStorage {
     // Initialize monthly data with 12 months of data
     this.monthlyData = [];
     for (let i = 11; i >= 0; i--) {
-      const month = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      const month = new Date(currentDate.getFullYear(), currentDate.getMonth() - i, 1);
       
       // Base values with small growth each month
       const baseInstitutional = 5500 + (i * 60);

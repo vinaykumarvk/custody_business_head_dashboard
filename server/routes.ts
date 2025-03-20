@@ -200,6 +200,64 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Failed to create monthly customer data" });
     }
   });
+  
+  // Customer History endpoint
+  app.get("/api/customer-history", async (_req, res) => {
+    try {
+      const data = await storage.getCustomerHistory();
+      
+      // Format dates for JSON
+      const formattedData = data.map(item => ({
+        ...item,
+        date: item.date instanceof Date ? item.date.toISOString() : item.date
+      }));
+      
+      res.json(formattedData);
+    } catch (error) {
+      console.error("Error fetching customer history:", error);
+      res.status(500).json({ message: "Failed to fetch customer history data" });
+    }
+  });
+  
+  // Add new customer history record
+  app.post("/api/customer-history", async (req, res) => {
+    try {
+      const { 
+        date, totalCustomers, newCustomers, churnedCustomers, retentionRate,
+        acquisitionCost, lifetimeValue, institutional, corporate, hni, funds,
+        total, new: newValue, active 
+      } = req.body;
+      
+      if (!date || !totalCustomers || !newCustomers || !churnedCustomers || 
+          !retentionRate || !acquisitionCost || !lifetimeValue || 
+          !institutional || !corporate || !hni || !funds || 
+          !total || !newValue || !active) {
+        return res.status(400).json({ message: "Missing required fields" });
+      }
+      
+      const newData = await storage.createCustomerHistory({
+        date: new Date(date),
+        totalCustomers,
+        newCustomers,
+        churnedCustomers,
+        retentionRate,
+        acquisitionCost,
+        lifetimeValue,
+        institutional,
+        corporate, 
+        hni,
+        funds,
+        total,
+        new: newValue, 
+        active
+      });
+      
+      res.status(201).json(newData);
+    } catch (error) {
+      console.error("Error creating customer history record:", error);
+      res.status(500).json({ message: "Failed to create customer history record" });
+    }
+  });
 
   const httpServer = createServer(app);
 
