@@ -189,7 +189,7 @@ export default function Dashboard() {
                 title="Income MTD" 
                 value={`$${income.incomeMTD}M`}
                 icon={<FiDollarSign size={24} color="#2448a5" />}
-                change={3.8}
+                change={parseFloat(income.growth)}
               />
               
               <MetricCard 

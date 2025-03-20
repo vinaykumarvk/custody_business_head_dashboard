@@ -116,6 +116,7 @@ export const income = pgTable("income", {
   id: serial("id").primaryKey(),
   incomeMTD: numeric("income_mtd").notNull(),
   outstandingFees: numeric("outstanding_fees").notNull(),
+  growth: numeric("growth"),  // Growth percentage
 });
 
 export const insertIncomeSchema = createInsertSchema(income).omit({

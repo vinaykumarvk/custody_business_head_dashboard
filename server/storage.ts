@@ -244,8 +244,49 @@ export class PostgresStorage implements IStorage {
   }
 
   async getIncome(): Promise<Income | undefined> {
-    const result = await db.select().from(income);
-    return result[0];
+    // First check if we have existing data in the database
+    const existingIncome = await db.select().from(income);
+    if (existingIncome.length > 0) {
+      return existingIncome[0];
+    }
+    
+    // Get the income history data
+    const incomeHistoryData = await this.getIncomeHistory();
+    
+    // If no history data, return undefined
+    if (incomeHistoryData.length < 2) {
+      return undefined;
+    }
+    
+    // Sort by date, most recent first
+    const sortedData = incomeHistoryData.sort((a, b) => 
+      new Date(b.date).getTime() - new Date(a.date).getTime()
+    );
+    
+    // Get the most recent and previous month data
+    const latestData = sortedData[0];
+    const previousData = sortedData[1];
+    
+    // Calculate income values
+    const latestAmount = parseFloat(latestData.amount);
+    const previousAmount = parseFloat(previousData.amount);
+    
+    // Calculate the MTD income and outstanding fees (for simplicity, using 30% of income as outstanding)
+    const incomeMTD = latestAmount;
+    const outstandingFees = incomeMTD * 0.3;
+    
+    // Calculate growth rate
+    const growthRate = ((latestAmount - previousAmount) / previousAmount) * 100;
+    
+    // Insert the calculated metrics into the database
+    const incomeToInsert = {
+      incomeMTD: incomeMTD.toFixed(2),
+      outstandingFees: outstandingFees.toFixed(2),
+      growth: growthRate.toFixed(1)
+    };
+    
+    const [insertedIncome] = await db.insert(income).values(incomeToInsert).returning();
+    return insertedIncome;
   }
 
   async getIncomeByService(): Promise<IncomeByService[]> {
@@ -577,7 +618,8 @@ export class PostgresStorage implements IStorage {
         console.log("Seeding income...");
         await db.insert(income).values({
           incomeMTD: "2.75",
-          outstandingFees: "0.85"
+          outstandingFees: "0.85",
+          growth: "3.2"
         });
       }
       
@@ -926,7 +968,8 @@ export class MemStorage implements IStorage {
     this.inc = {
       id: 1,
       incomeMTD: "2.75",
-      outstandingFees: "0.85"
+      outstandingFees: "0.85",
+      growth: "3.2"
     };
     this.incByService = [
       { id: 1, serviceName: "Custody Fees", amount: "12.4" },
