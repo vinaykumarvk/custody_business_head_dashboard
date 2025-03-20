@@ -187,8 +187,53 @@ export class PostgresStorage implements IStorage {
   }
 
   async getAucMetrics(): Promise<AucMetrics | undefined> {
-    const result = await db.select().from(aucMetrics);
-    return result[0];
+    // Get the AUC history data
+    const aucHistoryData = await this.getAucHistory();
+    
+    // If no history data, return from aucMetrics table (fallback)
+    if (aucHistoryData.length < 2) {
+      const result = await db.select().from(aucMetrics);
+      return result[0];
+    }
+    
+    // Sort by date, most recent first
+    const sortedData = aucHistoryData.sort((a, b) => 
+      new Date(b.date).getTime() - new Date(a.date).getTime()
+    );
+    
+    // Get the most recent and previous month data
+    const latestData = sortedData[0];
+    const previousData = sortedData[1];
+    
+    // Calculate total AUC for latest month (sum of all segments)
+    const latestEquity = parseFloat(latestData.equity);
+    const latestFixedIncome = parseFloat(latestData.fixedIncome);
+    const latestMutualFunds = parseFloat(latestData.mutualFunds);
+    const latestOthers = parseFloat(latestData.others);
+    
+    const totalLatest = latestEquity + latestFixedIncome + latestMutualFunds + latestOthers;
+    
+    // Calculate total AUC for previous month
+    const previousEquity = parseFloat(previousData.equity);
+    const previousFixedIncome = parseFloat(previousData.fixedIncome);
+    const previousMutualFunds = parseFloat(previousData.mutualFunds);
+    const previousOthers = parseFloat(previousData.others);
+    
+    const totalPrevious = previousEquity + previousFixedIncome + previousMutualFunds + previousOthers;
+    
+    // Calculate growth rate
+    const growthRate = ((totalLatest - totalPrevious) / totalPrevious) * 100;
+    
+    // Return metrics based on latest AUC history data
+    return {
+      id: 1,
+      totalAuc: totalLatest.toFixed(1),
+      equity: latestEquity.toFixed(1),
+      fixedIncome: latestFixedIncome.toFixed(1),
+      mutualFunds: latestMutualFunds.toFixed(1),
+      others: latestOthers.toFixed(1),
+      growth: growthRate.toFixed(1)
+    };
   }
 
   async getIncome(): Promise<Income | undefined> {
