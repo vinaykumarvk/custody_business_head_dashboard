@@ -57,7 +57,10 @@ const CustomerSegmentsChart: React.FC<CustomerSegmentsChartProps> = ({ data }) =
           legend: {
             position: 'bottom',
             labels: {
-              padding: 15
+              padding: 15,
+              usePointStyle: true,
+              pointStyle: 'rectRounded',
+              pointStyleWidth: 16 // Maintain rectangular style for color indicators
             }
           },
           tooltip: {
