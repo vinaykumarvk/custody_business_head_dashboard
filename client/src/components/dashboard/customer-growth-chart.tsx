@@ -60,6 +60,7 @@ const CustomerGrowthChart: React.FC<CustomerGrowthChartProps> = ({ data }) => {
             borderWidth: 2,
             tension: 0.4,
             fill: false,
+            pointRadius: 0,
             yAxisID: 'y'
           },
           {
@@ -70,6 +71,7 @@ const CustomerGrowthChart: React.FC<CustomerGrowthChartProps> = ({ data }) => {
             borderWidth: 2,
             tension: 0.4,
             fill: false,
+            pointRadius: 0,
             yAxisID: 'y1'
           }
         ]
