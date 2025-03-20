@@ -154,164 +154,188 @@ export default function Dashboard() {
     </Alert>
   );
 
+  // Section header component
+  const SectionHeader = ({ title }: { title: string }) => (
+    <div className="mb-5 pb-2 border-b border-gray-200">
+      <h2 className="text-xl font-medium text-custodyBlue font-roboto">{title}</h2>
+    </div>
+  );
+
   return (
     <div className="bg-custodyBackground min-h-screen font-roboto">
       <div className="container mx-auto px-4 py-4">
+        <div className="mb-6">
+          <h1 className="text-2xl font-bold text-custodyBlue font-roboto">Custody Services Dashboard</h1>
+          <p className="text-custodyGray mt-1">Business Head Overview for Custody Services</p>
+        </div>
+        
+        {/* Display any errors */}
         {customerMetricsError && renderErrorAlert("Failed to load customer metrics")}
         {aucMetricsError && renderErrorAlert("Failed to load AUC metrics")}
         
-        {/* Customer Metrics */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 mb-6">
-          {customerMetricsLoading || aucMetricsLoading ? (
-            Array(4).fill(0).map((_, i) => (
-              <div key={i} className="bg-white rounded-md shadow-sm p-5">
-                <Skeleton className="h-5 w-32 mb-2" />
-                <Skeleton className="h-8 w-24 mb-2" />
-                <Skeleton className="h-4 w-32" />
-              </div>
-            ))
-          ) : (
-            <>
-              <MetricCard 
-                title="Total Customers" 
-                value={formatNumberWithCommas(customerMetrics?.totalCustomers)}
-                icon={<FiUsers size={24} color="#2448a5" />}
-              />
-              
-              <MetricCard 
-                title="Active Customers" 
-                value={formatNumberWithCommas(customerMetrics?.activeCustomers)}
-                icon={<FiUsers size={24} color="#2448a5" />}
-                subtitle="Monthly active customers"
-              />
-              
-              <MetricCard 
-                title="New Customers MTD" 
-                value={formatNumberWithCommas(customerMetrics?.newCustomersMTD)}
-                icon={<FiUserPlus size={24} color="#2448a5" />}
-                change={4.7}
-              />
-              
-              <MetricCard 
-                title="AUC (Assets Under Custody)" 
-                value={`$${aucMetrics?.totalAuc}B`}
-                icon={<FiBarChart2 size={24} color="#2448a5" />}
-                change={parseFloat(aucMetrics?.growth)}
-              />
-            </>
-          )}
-        </div>
-        
-        {customerGrowthError && renderErrorAlert("Failed to load customer growth data")}
-        {customerSegmentsError && renderErrorAlert("Failed to load customer segments data")}
-        
-        {/* Second row */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 mb-6">
-          <div className="bg-white p-5 rounded-md shadow-sm col-span-2">
-            {customerGrowthLoading ? (
-              <div className="animate-pulse h-80 bg-gray-200 rounded-md"></div>
-            ) : customerGrowth ? (
-              <CustomerGrowthChart data={customerGrowth} />
-            ) : null}
+        {/* CUSTOMERS SECTION */}
+        <div className="bg-white p-6 rounded-lg shadow-sm mb-6">
+          <SectionHeader title="Customers" />
+          
+          {/* Customer Metrics Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-6">
+            {customerMetricsLoading ? (
+              Array(3).fill(0).map((_, i) => (
+                <div key={i} className="bg-white rounded-md shadow-sm p-5">
+                  <Skeleton className="h-5 w-32 mb-2" />
+                  <Skeleton className="h-8 w-24 mb-2" />
+                  <Skeleton className="h-4 w-32" />
+                </div>
+              ))
+            ) : (
+              <>
+                <MetricCard 
+                  title="Total Customers" 
+                  value={formatNumberWithCommas(customerMetrics?.totalCustomers)}
+                  icon={<FiUsers size={24} color="#2448a5" />}
+                  category="customers"
+                />
+                
+                <MetricCard 
+                  title="Active Customers" 
+                  value={formatNumberWithCommas(customerMetrics?.activeCustomers)}
+                  icon={<FiUsers size={24} color="#2448a5" />}
+                  subtitle="Monthly active customers"
+                  category="customers"
+                />
+                
+                <MetricCard 
+                  title="New Customers MTD" 
+                  value={formatNumberWithCommas(customerMetrics?.newCustomersMTD)}
+                  icon={<FiUserPlus size={24} color="#2448a5" />}
+                  change={4.7}
+                  category="customers"
+                />
+              </>
+            )}
           </div>
           
-          <div className="bg-white p-5 rounded-md shadow-sm">
-            {customerSegmentsLoading ? (
-              <div className="animate-pulse h-60 bg-gray-200 rounded-md"></div>
-            ) : customerSegments ? (
-              <CustomerSegmentsChart data={customerSegments} />
-            ) : null}
-          </div>
-        </div>
-        
-        {tradingVolumeError && renderErrorAlert("Failed to load trading volume data")}
-        {aucHistoryError && renderErrorAlert("Failed to load AUC history data")}
-        
-        {/* Third row */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 mb-6">
-          <div className="bg-white p-5 rounded-md shadow-sm">
-            {tradingVolumeLoading ? (
-              <div className="animate-pulse h-80 bg-gray-200 rounded-md"></div>
-            ) : tradingVolume ? (
-              <TradingVolumeChart data={tradingVolume} />
-            ) : null}
+          {customerGrowthError && renderErrorAlert("Failed to load customer growth data")}
+          {customerSegmentsError && renderErrorAlert("Failed to load customer segments data")}
+          
+          {/* Customer Charts */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 mb-6">
+            <div className="bg-white p-5 rounded-md shadow-sm col-span-2">
+              {customerGrowthLoading ? (
+                <div className="animate-pulse h-80 bg-gray-200 rounded-md"></div>
+              ) : customerGrowth ? (
+                <CustomerGrowthChart data={customerGrowth} />
+              ) : null}
+            </div>
+            
+            <div className="bg-white p-5 rounded-md shadow-sm">
+              {customerSegmentsLoading ? (
+                <div className="animate-pulse h-60 bg-gray-200 rounded-md"></div>
+              ) : customerSegments ? (
+                <CustomerSegmentsChart data={customerSegments} />
+              ) : null}
+            </div>
           </div>
           
-          <div className="bg-white p-5 rounded-md shadow-sm">
-            {aucHistoryLoading ? (
-              <div className="animate-pulse h-80 bg-gray-200 rounded-md"></div>
-            ) : aucHistory ? (
-              <AucHistoryChart data={aucHistory} />
-            ) : null}
-          </div>
-        </div>
-        
-        {incomeError && renderErrorAlert("Failed to load income data")}
-        
-        {/* Income Metrics */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 mb-6">
-          {incomeLoading ? (
-            Array(2).fill(0).map((_, i) => (
-              <div key={i} className="bg-white rounded-md shadow-sm p-5">
-                <Skeleton className="h-5 w-32 mb-2" />
-                <Skeleton className="h-8 w-24 mb-2" />
-                <Skeleton className="h-4 w-32" />
-              </div>
-            ))
-          ) : income ? (
-            <>
-              <MetricCard 
-                title="Income MTD" 
-                value={`$${income.incomeMTD}M`}
-                icon={<FiDollarSign size={24} color="#2448a5" />}
-                change={parseFloat(income.growth)}
-              />
-              
-              <MetricCard 
-                title="Outstanding Fees" 
-                value={`$${income.outstandingFees}M`}
-                icon={<FiDollarSign size={24} color="#2448a5" />}
-                change={-2.1}
-              />
-              
-              <div className="col-span-2">
-                {/* Placeholder for future metrics */}
-              </div>
-            </>
-          ) : null}
-        </div>
-        
-        {incomeHistoryError && renderErrorAlert("Failed to load income history data")}
-        {incomeByServiceError && renderErrorAlert("Failed to load income by service data")}
-        
-        {/* Fourth row */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 mb-6">
-          <div className="bg-white p-5 rounded-md shadow-sm col-span-2">
-            {incomeHistoryLoading ? (
-              <div className="animate-pulse h-80 bg-gray-200 rounded-md"></div>
-            ) : incomeHistory ? (
-              <IncomeHistoryChart data={incomeHistory} />
-            ) : null}
-          </div>
+          {/* Top Customers Table */}
+          {topCustomersError && renderErrorAlert("Failed to load top customers data")}
           
           <div className="bg-white p-5 rounded-md shadow-sm">
-            {incomeByServiceLoading ? (
-              <div className="animate-pulse h-60 bg-gray-200 rounded-md"></div>
-            ) : incomeByService ? (
-              <IncomeByServiceChart data={incomeByService} />
+            <h3 className="text-lg font-medium text-custodyBlue mb-4 font-roboto">Top Customers</h3>
+            {topCustomersLoading ? (
+              <div className="animate-pulse h-80 bg-gray-200 rounded-md"></div>
+            ) : topCustomers ? (
+              <TopCustomersTable customers={topCustomers} />
             ) : null}
           </div>
         </div>
         
-        {topCustomersError && renderErrorAlert("Failed to load top customers data")}
-        
-        {/* Top Customers Table */}
-        <div className="bg-white p-5 rounded-md shadow-sm mb-6">
-          {topCustomersLoading ? (
-            <div className="animate-pulse h-80 bg-gray-200 rounded-md"></div>
-          ) : topCustomers ? (
-            <TopCustomersTable customers={topCustomers} />
-          ) : null}
+        {/* REVENUE & ASSETS SECTION */}
+        <div className="bg-white p-6 rounded-lg shadow-sm mb-6">
+          <SectionHeader title="Revenue & Assets" />
+          
+          {/* Revenue Metrics Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-6">
+            {aucMetricsLoading || incomeLoading ? (
+              Array(3).fill(0).map((_, i) => (
+                <div key={i} className="bg-white rounded-md shadow-sm p-5">
+                  <Skeleton className="h-5 w-32 mb-2" />
+                  <Skeleton className="h-8 w-24 mb-2" />
+                  <Skeleton className="h-4 w-32" />
+                </div>
+              ))
+            ) : (
+              <>
+                <MetricCard 
+                  title="AUC (Assets Under Custody)" 
+                  value={`$${aucMetrics?.totalAuc}B`}
+                  icon={<FiBarChart2 size={24} color="#4caf50" />}
+                  change={parseFloat(aucMetrics?.growth)}
+                  category="revenue"
+                />
+                
+                <MetricCard 
+                  title="Income MTD" 
+                  value={`$${income?.incomeMTD}M`}
+                  icon={<FiDollarSign size={24} color="#4caf50" />}
+                  change={parseFloat(income?.growth)}
+                  category="revenue"
+                />
+                
+                <MetricCard 
+                  title="Outstanding Fees" 
+                  value={`$${income?.outstandingFees}M`}
+                  icon={<FiDollarSign size={24} color="#4caf50" />}
+                  subtitle="Pending collection"
+                  category="revenue"
+                />
+              </>
+            )}
+          </div>
+          
+          {tradingVolumeError && renderErrorAlert("Failed to load trading volume data")}
+          {aucHistoryError && renderErrorAlert("Failed to load AUC history data")}
+          
+          {/* Asset Charts */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 mb-6">
+            <div className="bg-white p-5 rounded-md shadow-sm">
+              {tradingVolumeLoading ? (
+                <div className="animate-pulse h-80 bg-gray-200 rounded-md"></div>
+              ) : tradingVolume ? (
+                <TradingVolumeChart data={tradingVolume} />
+              ) : null}
+            </div>
+            
+            <div className="bg-white p-5 rounded-md shadow-sm">
+              {aucHistoryLoading ? (
+                <div className="animate-pulse h-80 bg-gray-200 rounded-md"></div>
+              ) : aucHistory ? (
+                <AucHistoryChart data={aucHistory} />
+              ) : null}
+            </div>
+          </div>
+          
+          {incomeHistoryError && renderErrorAlert("Failed to load income history data")}
+          {incomeByServiceError && renderErrorAlert("Failed to load income by service data")}
+          
+          {/* Income Charts */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+            <div className="bg-white p-5 rounded-md shadow-sm">
+              {incomeHistoryLoading ? (
+                <div className="animate-pulse h-80 bg-gray-200 rounded-md"></div>
+              ) : incomeHistory ? (
+                <IncomeHistoryChart data={incomeHistory} />
+              ) : null}
+            </div>
+            
+            <div className="bg-white p-5 rounded-md shadow-sm">
+              {incomeByServiceLoading ? (
+                <div className="animate-pulse h-60 bg-gray-200 rounded-md"></div>
+              ) : incomeByService ? (
+                <IncomeByServiceChart data={incomeByService} />
+              ) : null}
+            </div>
+          </div>
         </div>
       </div>
     </div>

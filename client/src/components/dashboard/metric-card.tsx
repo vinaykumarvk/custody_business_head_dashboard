@@ -8,6 +8,8 @@ interface MetricCardProps {
   change?: number;
   backgroundColor?: string;
   textColor?: string;
+  accentColor?: string;
+  category?: 'customers' | 'revenue';
 }
 
 const MetricCard: React.FC<MetricCardProps> = ({ 
@@ -17,13 +19,33 @@ const MetricCard: React.FC<MetricCardProps> = ({
   subtitle,
   change, 
   backgroundColor = 'white',
-  textColor = '#2448a5'
+  textColor = '#2448a5',
+  accentColor,
+  category
 }) => {
   const isPositive = change && change >= 0;
   
+  // Default accent colors based on category if not provided
+  let borderColor = accentColor;
+  if (!borderColor) {
+    if (category === 'customers') {
+      borderColor = '#2448a5'; // Blue
+    } else if (category === 'revenue') {
+      borderColor = '#4caf50'; // Green for revenue
+    } else {
+      borderColor = '#2448a5'; // Default blue
+    }
+  }
+  
   return (
-    <div className="bg-white rounded-md shadow-sm p-5 transition-all hover:shadow-md">
-      <div className="flex justify-between items-start">
+    <div className="relative bg-white rounded-md shadow-sm p-5 transition-all hover:shadow-md overflow-hidden">
+      {/* Colored left edge */}
+      <div 
+        className="absolute top-0 left-0 h-full w-1.5" 
+        style={{ backgroundColor: borderColor }}
+      ></div>
+      
+      <div className="flex justify-between items-start pl-3">
         <div>
           <h3 className="text-custodyGray text-sm font-medium mb-1 font-roboto">{title}</h3>
           <p className="text-2xl font-medium text-custodyBlue font-roboto font-variant-numeric tabular-nums">{value}</p>
