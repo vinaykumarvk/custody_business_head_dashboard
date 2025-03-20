@@ -1562,8 +1562,8 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getIncome(): Promise<Income | undefined> {
-    const [income] = await db.select().from(income);
-    return income || undefined;
+    const [incomeData] = await db.select().from(income);
+    return incomeData || undefined;
   }
 
   async getIncomeByService(): Promise<IncomeByService[]> {

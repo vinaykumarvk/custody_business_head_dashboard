@@ -66,9 +66,8 @@ const IncomeByServiceChart: React.FC<IncomeByServiceChartProps> = ({ data }) => 
             callbacks: {
               label: (context) => {
                 const label = context.label || '';
-                const value = context.parsed;
                 const percentage = percentages[context.dataIndex];
-                return `${label}: $${value}M (${percentage}%)`;
+                return `${label}: ${percentage}%`;
               }
             }
           }
