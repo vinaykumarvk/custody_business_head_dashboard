@@ -244,18 +244,13 @@ export class PostgresStorage implements IStorage {
   }
 
   async getIncome(): Promise<Income | undefined> {
-    // First check if we have existing data in the database
-    const existingIncome = await db.select().from(income);
-    if (existingIncome.length > 0) {
-      return existingIncome[0];
-    }
-    
-    // Get the income history data
+    // Get the income history data first
     const incomeHistoryData = await this.getIncomeHistory();
     
-    // If no history data, return undefined
+    // If no history data, return existing or undefined
     if (incomeHistoryData.length < 2) {
-      return undefined;
+      const existingIncome = await db.select().from(income);
+      return existingIncome.length > 0 ? existingIncome[0] : undefined;
     }
     
     // Sort by date, most recent first
@@ -278,15 +273,33 @@ export class PostgresStorage implements IStorage {
     // Calculate growth rate
     const growthRate = ((latestAmount - previousAmount) / previousAmount) * 100;
     
-    // Insert the calculated metrics into the database
-    const incomeToInsert = {
-      incomeMTD: incomeMTD.toFixed(2),
-      outstandingFees: outstandingFees.toFixed(2),
-      growth: growthRate.toFixed(1)
-    };
+    // Update or insert the income data
+    const existingIncome = await db.select().from(income);
     
-    const [insertedIncome] = await db.insert(income).values(incomeToInsert).returning();
-    return insertedIncome;
+    if (existingIncome.length > 0) {
+      // Update existing record
+      await db.update(income)
+        .set({
+          incomeMTD: incomeMTD,
+          outstandingFees: outstandingFees,
+          growth: growthRate
+        })
+        .where(eq(income.id, existingIncome[0].id));
+      
+      // Get the updated record
+      const [updatedIncome] = await db.select().from(income).where(eq(income.id, existingIncome[0].id));
+      return updatedIncome;
+    } else {
+      // Insert new record
+      const [insertedIncome] = await db.insert(income)
+        .values({
+          incomeMTD: incomeMTD,
+          outstandingFees: outstandingFees,
+          growth: growthRate
+        })
+        .returning();
+      return insertedIncome;
+    }
   }
 
   async getIncomeByService(): Promise<IncomeByService[]> {
