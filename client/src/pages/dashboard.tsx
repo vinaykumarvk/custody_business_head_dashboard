@@ -156,7 +156,7 @@ export default function Dashboard() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 mb-6">
           <div className="bg-white p-5 rounded-md shadow-sm">
             {tradingVolumeLoading ? (
-              <div className="animate-pulse h-80 bg-gray-200 rounded"></div>
+              <div className="animate-pulse h-80 bg-gray-200 rounded-md"></div>
             ) : tradingVolume ? (
               <TradingVolumeChart data={tradingVolume} />
             ) : null}
@@ -164,7 +164,7 @@ export default function Dashboard() {
           
           <div className="bg-white p-5 rounded-md shadow-sm">
             {aucHistoryLoading ? (
-              <div className="animate-pulse h-80 bg-gray-200 rounded"></div>
+              <div className="animate-pulse h-80 bg-gray-200 rounded-md"></div>
             ) : aucHistory ? (
               <AucHistoryChart data={aucHistory} />
             ) : null}
@@ -213,7 +213,7 @@ export default function Dashboard() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 mb-6">
           <div className="bg-white p-5 rounded-md shadow-sm col-span-2">
             {incomeHistoryLoading ? (
-              <div className="animate-pulse h-80 bg-gray-200 rounded"></div>
+              <div className="animate-pulse h-80 bg-gray-200 rounded-md"></div>
             ) : incomeHistory ? (
               <IncomeHistoryChart data={incomeHistory} />
             ) : null}
@@ -221,7 +221,7 @@ export default function Dashboard() {
           
           <div className="bg-white p-5 rounded-md shadow-sm">
             {incomeByServiceLoading ? (
-              <div className="animate-pulse h-60 bg-gray-200 rounded"></div>
+              <div className="animate-pulse h-60 bg-gray-200 rounded-md"></div>
             ) : incomeByService ? (
               <IncomeByServiceChart data={incomeByService} />
             ) : null}
@@ -233,7 +233,7 @@ export default function Dashboard() {
         {/* Top Customers Table */}
         <div className="bg-white p-5 rounded-md shadow-sm mb-6">
           {topCustomersLoading ? (
-            <div className="animate-pulse h-80 bg-gray-200 rounded"></div>
+            <div className="animate-pulse h-80 bg-gray-200 rounded-md"></div>
           ) : topCustomers ? (
             <TopCustomersTable customers={topCustomers} />
           ) : null}
