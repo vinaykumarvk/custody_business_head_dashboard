@@ -163,7 +163,7 @@ export default function Dashboard() {
 
   return (
     <div className="bg-custodyBackground min-h-screen font-roboto">
-      <div className="container mx-auto px-4 py-4 w-2/3 max-w-5xl">
+      <div className="container mx-auto px-4 py-4 w-full">
         {/* Display any errors */}
         {customerMetricsError && renderErrorAlert("Failed to load customer metrics")}
         {aucMetricsError && renderErrorAlert("Failed to load AUC metrics")}
