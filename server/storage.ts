@@ -10,7 +10,8 @@ import {
   incomeByService, type IncomeByService, type InsertIncomeByService,
   incomeHistory, type IncomeHistory, type InsertIncomeHistory,
   topCustomers, type TopCustomers, type InsertTopCustomers,
-  monthlyCustomerData, type MonthlyCustomerData, type InsertMonthlyCustomerData
+  monthlyCustomerData, type MonthlyCustomerData, type InsertMonthlyCustomerData,
+  customerHistory, type CustomerHistory, type InsertCustomerHistory
 } from "@shared/schema";
 import { eq } from 'drizzle-orm';
 import { drizzle } from 'drizzle-orm/postgres-js';
@@ -45,6 +46,10 @@ export interface IStorage {
   // Monthly customer data methods
   getMonthlyCustomerData(): Promise<MonthlyCustomerData[]>;
   createMonthlyCustomerData(data: InsertMonthlyCustomerData): Promise<MonthlyCustomerData>;
+  
+  // Customer history methods
+  getCustomerHistory(): Promise<CustomerHistory[]>;
+  createCustomerHistory(data: InsertCustomerHistory): Promise<CustomerHistory>;
   
   // Derived customer metrics methods
   calculateDerivedCustomerMetrics(dataPoints: MonthlyCustomerData[]): Promise<CustomerMetrics>;
@@ -133,6 +138,17 @@ export class PostgresStorage implements IStorage {
   
   async createMonthlyCustomerData(data: InsertMonthlyCustomerData): Promise<MonthlyCustomerData> {
     const result = await db.insert(monthlyCustomerData).values(data).returning();
+    return result[0];
+  }
+  
+  // Customer history methods
+  async getCustomerHistory(): Promise<CustomerHistory[]> {
+    const result = await db.select().from(customerHistory);
+    return result;
+  }
+  
+  async createCustomerHistory(data: InsertCustomerHistory): Promise<CustomerHistory> {
+    const result = await db.insert(customerHistory).values(data).returning();
     return result[0];
   }
   
@@ -598,6 +614,7 @@ export class MemStorage implements IStorage {
   private incHistory: IncomeHistory[];
   private topCust: TopCustomers[];
   private monthlyData: MonthlyCustomerData[];
+  private custHistory: CustomerHistory[];
   currentId: number;
 
   constructor() {
@@ -610,6 +627,7 @@ export class MemStorage implements IStorage {
       newCustomersMTD: 175,
       date: new Date()
     };
+    this.custHistory = [];
     
     // Initialize monthly data with 12 months of data
     this.monthlyData = [];

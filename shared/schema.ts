@@ -186,3 +186,22 @@ export const insertMonthlyCustomerDataSchema = createInsertSchema(monthlyCustome
 
 export type InsertMonthlyCustomerData = z.infer<typeof insertMonthlyCustomerDataSchema>;
 export type MonthlyCustomerData = typeof monthlyCustomerData.$inferSelect;
+
+// Customer History schema
+export const customerHistory = pgTable("customer_history", {
+  id: serial("id").primaryKey(),
+  date: timestamp("date").notNull(),
+  totalCustomers: integer("total_customers").notNull(),
+  newCustomers: integer("new_customers").notNull(),
+  churnedCustomers: integer("churned_customers").notNull(),
+  retentionRate: numeric("retention_rate").notNull(),
+  acquisitionCost: numeric("acquisition_cost").notNull(),
+  lifetimeValue: numeric("lifetime_value").notNull(),
+});
+
+export const insertCustomerHistorySchema = createInsertSchema(customerHistory).omit({
+  id: true,
+});
+
+export type InsertCustomerHistory = z.infer<typeof insertCustomerHistorySchema>;
+export type CustomerHistory = typeof customerHistory.$inferSelect;
