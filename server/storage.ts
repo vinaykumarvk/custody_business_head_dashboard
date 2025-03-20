@@ -106,27 +106,13 @@ export class PostgresStorage implements IStorage {
   }
 
   async getCustomerGrowth(): Promise<CustomerGrowth[]> {
-    // Get customer history data
-    const history = await this.getCustomerHistory();
+    // Get data directly from customerGrowth table
+    const result = await db.select().from(customerGrowth);
     
-    // If no history data, return from customerGrowth table (fallback)
-    if (history.length === 0) {
-      const result = await db.select().from(customerGrowth);
-      return result;
-    }
-    
-    // Sort by date, oldest first
-    const sortedData = history.sort((a, b) => 
+    // Sort by date, oldest first for consistent display
+    return result.sort((a, b) => 
       new Date(a.date).getTime() - new Date(b.date).getTime()
     );
-    
-    // Map customer history to customer growth format
-    return sortedData.map((item, index) => ({
-      id: index + 1, 
-      date: new Date(item.date),
-      totalCustomers: item.totalCustomers,
-      newCustomers: item.newCustomers
-    }));
   }
 
   async getCustomerSegments(): Promise<CustomerSegments[]> {
