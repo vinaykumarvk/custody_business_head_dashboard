@@ -17,126 +17,154 @@ export const insertUserSchema = createInsertSchema(users).pick({
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
 
-// KPI Metrics schema
-export const kpiMetrics = pgTable("kpi_metrics", {
+// Customer metrics schema
+export const customerMetrics = pgTable("customer_metrics", {
   id: serial("id").primaryKey(),
-  aum: numeric("aum").notNull(),
-  transactions: integer("transactions").notNull(),
-  clients: integer("clients").notNull(),
-  revenue: numeric("revenue").notNull(),
-  aumChangePercent: numeric("aum_change_percent").notNull(),
-  transactionsChangePercent: numeric("transactions_change_percent").notNull(),
-  clientsChangePercent: numeric("clients_change_percent").notNull(),
-  revenueChangePercent: numeric("revenue_change_percent").notNull(),
+  totalCustomers: integer("total_customers").notNull(),
+  activeCustomers: integer("active_customers").notNull(),
+  newCustomersMTD: integer("new_customers_mtd").notNull(),
   date: timestamp("date").notNull(),
 });
 
-export const insertKpiMetricsSchema = createInsertSchema(kpiMetrics).omit({
+export const insertCustomerMetricsSchema = createInsertSchema(customerMetrics).omit({
   id: true,
 });
 
-export type InsertKpiMetrics = z.infer<typeof insertKpiMetricsSchema>;
-export type KpiMetrics = typeof kpiMetrics.$inferSelect;
+export type InsertCustomerMetrics = z.infer<typeof insertCustomerMetricsSchema>;
+export type CustomerMetrics = typeof customerMetrics.$inferSelect;
 
-// Asset Allocation schema
-export const assetAllocations = pgTable("asset_allocations", {
+// Customer Growth schema
+export const customerGrowth = pgTable("customer_growth", {
   id: serial("id").primaryKey(),
-  equities: numeric("equities").notNull(),
-  fixedIncome: numeric("fixed_income").notNull(),
-  cash: numeric("cash").notNull(),
-  alternatives: numeric("alternatives").notNull(),
   date: timestamp("date").notNull(),
+  totalCustomers: integer("total_customers").notNull(),
+  newCustomers: integer("new_customers").notNull(),
 });
 
-export const insertAssetAllocationSchema = createInsertSchema(assetAllocations).omit({
+export const insertCustomerGrowthSchema = createInsertSchema(customerGrowth).omit({
   id: true,
 });
 
-export type InsertAssetAllocation = z.infer<typeof insertAssetAllocationSchema>;
-export type AssetAllocation = typeof assetAllocations.$inferSelect;
+export type InsertCustomerGrowth = z.infer<typeof insertCustomerGrowthSchema>;
+export type CustomerGrowth = typeof customerGrowth.$inferSelect;
 
-// Asset Performance schema
-export const assetPerformance = pgTable("asset_performance", {
+// Customer Segments schema
+export const customerSegments = pgTable("customer_segments", {
   id: serial("id").primaryKey(),
-  month: text("month").notNull(),
-  equityAssets: numeric("equity_assets").notNull(),
+  segmentName: text("segment_name").notNull(),
+  percentage: numeric("percentage").notNull(),
+});
+
+export const insertCustomerSegmentsSchema = createInsertSchema(customerSegments).omit({
+  id: true,
+});
+
+export type InsertCustomerSegments = z.infer<typeof insertCustomerSegmentsSchema>;
+export type CustomerSegments = typeof customerSegments.$inferSelect;
+
+// Trading Volume schema
+export const tradingVolume = pgTable("trading_volume", {
+  id: serial("id").primaryKey(),
+  date: timestamp("date").notNull(),
+  volume: numeric("volume").notNull(),
+});
+
+export const insertTradingVolumeSchema = createInsertSchema(tradingVolume).omit({
+  id: true,
+});
+
+export type InsertTradingVolume = z.infer<typeof insertTradingVolumeSchema>;
+export type TradingVolume = typeof tradingVolume.$inferSelect;
+
+// AUC History schema
+export const aucHistory = pgTable("auc_history", {
+  id: serial("id").primaryKey(),
+  date: timestamp("date").notNull(),
+  equity: numeric("equity").notNull(),
   fixedIncome: numeric("fixed_income").notNull(),
-  year: integer("year").notNull(),
+  mutualFunds: numeric("mutual_funds").notNull(),
+  others: numeric("others").notNull(),
 });
 
-export const insertAssetPerformanceSchema = createInsertSchema(assetPerformance).omit({
+export const insertAucHistorySchema = createInsertSchema(aucHistory).omit({
   id: true,
 });
 
-export type InsertAssetPerformance = z.infer<typeof insertAssetPerformanceSchema>;
-export type AssetPerformance = typeof assetPerformance.$inferSelect;
+export type InsertAucHistory = z.infer<typeof insertAucHistorySchema>;
+export type AucHistory = typeof aucHistory.$inferSelect;
 
-// Transactions schema
-export const transactions = pgTable("transactions", {
+// AUC Metrics schema
+export const aucMetrics = pgTable("auc_metrics", {
   id: serial("id").primaryKey(),
-  securityName: text("security_name").notNull(),
-  securityTicker: text("security_ticker").notNull(),
-  securityInitial: text("security_initial").notNull(),
-  type: text("type").notNull(),
-  client: text("client").notNull(),
+  totalAuc: numeric("total_auc").notNull(),
+  equity: numeric("equity").notNull(),
+  fixedIncome: numeric("fixed_income").notNull(),
+  mutualFunds: numeric("mutual_funds").notNull(),
+  others: numeric("others").notNull(),
+});
+
+export const insertAucMetricsSchema = createInsertSchema(aucMetrics).omit({
+  id: true,
+});
+
+export type InsertAucMetrics = z.infer<typeof insertAucMetricsSchema>;
+export type AucMetrics = typeof aucMetrics.$inferSelect;
+
+// Income schema
+export const income = pgTable("income", {
+  id: serial("id").primaryKey(),
+  incomeMTD: numeric("income_mtd").notNull(),
+  outstandingFees: numeric("outstanding_fees").notNull(),
+});
+
+export const insertIncomeSchema = createInsertSchema(income).omit({
+  id: true,
+});
+
+export type InsertIncome = z.infer<typeof insertIncomeSchema>;
+export type Income = typeof income.$inferSelect;
+
+// Income by Service schema
+export const incomeByService = pgTable("income_by_service", {
+  id: serial("id").primaryKey(),
+  serviceName: text("service_name").notNull(),
   amount: numeric("amount").notNull(),
-  status: text("status").notNull(),
-  date: timestamp("date").notNull(),
 });
 
-export const insertTransactionSchema = createInsertSchema(transactions).omit({
+export const insertIncomeByServiceSchema = createInsertSchema(incomeByService).omit({
   id: true,
 });
 
-export type InsertTransaction = z.infer<typeof insertTransactionSchema>;
-export type Transaction = typeof transactions.$inferSelect;
+export type InsertIncomeByService = z.infer<typeof insertIncomeByServiceSchema>;
+export type IncomeByService = typeof incomeByService.$inferSelect;
 
-// Clients schema
-export const clients = pgTable("clients", {
+// Income History schema
+export const incomeHistory = pgTable("income_history", {
+  id: serial("id").primaryKey(),
+  date: timestamp("date").notNull(),
+  amount: numeric("amount").notNull(),
+});
+
+export const insertIncomeHistorySchema = createInsertSchema(incomeHistory).omit({
+  id: true,
+});
+
+export type InsertIncomeHistory = z.infer<typeof insertIncomeHistorySchema>;
+export type IncomeHistory = typeof incomeHistory.$inferSelect;
+
+// Top Revenue Customers schema
+export const topCustomers = pgTable("top_customers", {
   id: serial("id").primaryKey(),
   name: text("name").notNull(),
-  type: text("type").notNull(),
-  initials: text("initials").notNull(),
+  customerType: text("customer_type").notNull(),
+  revenue: numeric("revenue").notNull(),
   assets: numeric("assets").notNull(),
   changePercent: numeric("change_percent").notNull(),
 });
 
-export const insertClientSchema = createInsertSchema(clients).omit({
+export const insertTopCustomersSchema = createInsertSchema(topCustomers).omit({
   id: true,
 });
 
-export type InsertClient = z.infer<typeof insertClientSchema>;
-export type Client = typeof clients.$inferSelect;
-
-// Risk Metrics schema
-export const riskMetrics = pgTable("risk_metrics", {
-  id: serial("id").primaryKey(),
-  name: text("name").notNull(),
-  current: text("current").notNull(),
-  previous: text("previous").notNull(),
-  changePercent: numeric("change_percent").notNull(),
-  status: text("status").notNull(),
-});
-
-export const insertRiskMetricSchema = createInsertSchema(riskMetrics).omit({
-  id: true,
-});
-
-export type InsertRiskMetric = z.infer<typeof insertRiskMetricSchema>;
-export type RiskMetric = typeof riskMetrics.$inferSelect;
-
-// Security Alerts schema
-export const securityAlerts = pgTable("security_alerts", {
-  id: serial("id").primaryKey(),
-  title: text("title").notNull(),
-  description: text("description").notNull(),
-  timeAgo: text("time_ago").notNull(),
-  severity: text("severity").notNull(), // 'critical', 'warning', 'info', 'success'
-});
-
-export const insertSecurityAlertSchema = createInsertSchema(securityAlerts).omit({
-  id: true,
-});
-
-export type InsertSecurityAlert = z.infer<typeof insertSecurityAlertSchema>;
-export type SecurityAlert = typeof securityAlerts.$inferSelect;
+export type InsertTopCustomers = z.infer<typeof insertTopCustomersSchema>;
+export type TopCustomers = typeof topCustomers.$inferSelect;

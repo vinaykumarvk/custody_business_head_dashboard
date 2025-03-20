@@ -5,234 +5,234 @@ import { storage } from "./storage";
 export async function registerRoutes(app: Express): Promise<Server> {
   // Dashboard data endpoints
   
-  // KPI Metrics endpoint
-  app.get("/api/kpi-metrics", async (_req, res) => {
+  // Customer Metrics endpoint
+  app.get("/api/customer-metrics", async (_req, res) => {
     try {
       const metrics = {
-        aum: 8.72,
-        transactions: 142857,
-        clients: 3248,
-        revenue: 24.5,
-        aumChangePercent: 4.2,
-        transactionsChangePercent: 7.8,
-        clientsChangePercent: 2.5,
-        revenueChangePercent: -1.2
+        totalCustomers: 12450,
+        activeCustomers: 10230,
+        newCustomersMTD: 175,
+        date: new Date().toISOString()
       };
       
       res.json(metrics);
     } catch (error) {
-      res.status(500).json({ message: "Failed to fetch KPI metrics" });
+      res.status(500).json({ message: "Failed to fetch customer metrics" });
     }
   });
 
-  // Asset Allocation endpoint
-  app.get("/api/asset-allocation", async (_req, res) => {
+  // Customer Growth endpoint
+  app.get("/api/customer-growth", async (_req, res) => {
     try {
-      const allocation = {
-        equities: 45,
-        fixedIncome: 30,
-        cash: 15,
-        alternatives: 10
+      // Past 12 months data
+      const now = new Date();
+      const data = [];
+      
+      for (let i = 11; i >= 0; i--) {
+        const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
+        const baseTotal = 11000 + (11 - i) * 130;
+        const newCustomers = 100 + Math.floor(Math.random() * 150);
+        
+        data.push({
+          date: date.toISOString(),
+          totalCustomers: baseTotal,
+          newCustomers: newCustomers
+        });
+      }
+      
+      res.json(data);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch customer growth data" });
+    }
+  });
+
+  // Customer Segments endpoint
+  app.get("/api/customer-segments", async (_req, res) => {
+    try {
+      const segments = [
+        { id: 1, segmentName: "Institutional", percentage: 45 },
+        { id: 2, segmentName: "Pension Funds", percentage: 25 },
+        { id: 3, segmentName: "High Net Worth", percentage: 20 },
+        { id: 4, segmentName: "Retail", percentage: 10 }
+      ];
+      
+      res.json(segments);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch customer segments" });
+    }
+  });
+
+  // Trading Volume History endpoint
+  app.get("/api/trading-volume", async (_req, res) => {
+    try {
+      // Past 12 months data
+      const now = new Date();
+      const data = [];
+      
+      for (let i = 11; i >= 0; i--) {
+        const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
+        const volume = 22 + Math.floor(Math.random() * 8) + (i * 0.5);
+        
+        data.push({
+          date: date.toISOString(),
+          volume: volume
+        });
+      }
+      
+      res.json(data);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch trading volume data" });
+    }
+  });
+
+  // AUC (Assets Under Custody) History endpoint
+  app.get("/api/auc-history", async (_req, res) => {
+    try {
+      // Past 12 months data
+      const now = new Date();
+      const data = [];
+      
+      for (let i = 11; i >= 0; i--) {
+        const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
+        const baseEquity = 42 + (i * 0.4);
+        const baseFixedIncome = 35 + (i * 0.25);
+        const baseMutual = 18 + (i * 0.15);
+        const baseOthers = 9 + (i * 0.05);
+        
+        data.push({
+          date: date.toISOString(),
+          equity: baseEquity,
+          fixedIncome: baseFixedIncome,
+          mutualFunds: baseMutual,
+          others: baseOthers
+        });
+      }
+      
+      res.json(data);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch AUC history data" });
+    }
+  });
+
+  // AUC Metrics endpoint
+  app.get("/api/auc-metrics", async (_req, res) => {
+    try {
+      const metrics = {
+        totalAuc: 104.5,
+        equity: 48.2,
+        fixedIncome: 38.1,
+        mutualFunds: 10.2,
+        others: 8.0
       };
       
-      res.json(allocation);
+      res.json(metrics);
     } catch (error) {
-      res.status(500).json({ message: "Failed to fetch asset allocation" });
+      res.status(500).json({ message: "Failed to fetch AUC metrics" });
     }
   });
 
-  // Asset Performance endpoint
-  app.get("/api/asset-performance", async (_req, res) => {
+  // Income metrics endpoint
+  app.get("/api/income", async (_req, res) => {
     try {
-      const performance = {
-        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
-        equityAssets: [8.2, 8.1, 8.3, 8.7, 8.9, 9.1, 9.3, 9.4, 9.6, 9.8, 10.1, 10.4],
-        fixedIncome: [4.1, 4.2, 4.3, 4.5, 4.6, 4.7, 4.9, 5.0, 5.1, 5.2, 5.3, 5.4]
+      const incomeData = {
+        incomeMTD: 2.75,
+        outstandingFees: 0.85
       };
       
-      res.json(performance);
+      res.json(incomeData);
     } catch (error) {
-      res.status(500).json({ message: "Failed to fetch asset performance" });
+      res.status(500).json({ message: "Failed to fetch income data" });
     }
   });
 
-  // Recent Transactions endpoint
-  app.get("/api/transactions", async (_req, res) => {
+  // Income by Service endpoint
+  app.get("/api/income-by-service", async (_req, res) => {
     try {
-      const transactions = [
-        {
-          id: 1,
-          securityName: "Microsoft Corp.",
-          securityTicker: "MSFT",
-          securityInitial: "M",
-          type: "Purchase",
-          client: "GlobalTech Funds",
-          amount: 1245000,
-          status: "Completed"
-        },
-        {
-          id: 2,
-          securityName: "Apple Inc.",
-          securityTicker: "AAPL",
-          securityInitial: "A",
-          type: "Sale",
-          client: "SilverWing Pension",
-          amount: 876500,
-          status: "Completed"
-        },
-        {
-          id: 3,
-          securityName: "US Treasury Bond",
-          securityTicker: "10Y",
-          securityInitial: "T",
-          type: "Purchase",
-          client: "Horizon Insurance",
-          amount: 2450000,
-          status: "Pending"
-        },
-        {
-          id: 4,
-          securityName: "Amazon.com Inc.",
-          securityTicker: "AMZN",
-          securityInitial: "A",
-          type: "Purchase",
-          client: "BlueRock Asset Mgmt",
-          amount: 935000,
-          status: "Completed"
-        }
+      const incomeByService = [
+        { id: 1, serviceName: "Custody Fees", amount: 12.4 },
+        { id: 2, serviceName: "Transaction Fees", amount: 8.6 },
+        { id: 3, serviceName: "Value Added Services", amount: 5.2 },
+        { id: 4, serviceName: "Reporting & Analytics", amount: 3.1 }
       ];
       
-      res.json(transactions);
+      res.json(incomeByService);
     } catch (error) {
-      res.status(500).json({ message: "Failed to fetch transactions" });
+      res.status(500).json({ message: "Failed to fetch income by service data" });
     }
   });
 
-  // Top Performing Clients endpoint
-  app.get("/api/top-clients", async (_req, res) => {
+  // Income History endpoint
+  app.get("/api/income-history", async (_req, res) => {
     try {
-      const clients = [
-        {
-          id: 1,
-          name: "GlobalTech Funds",
-          type: "Institutional",
-          initials: "GT",
-          assets: 2.4,
-          changePercent: 12.5
-        },
-        {
-          id: 2,
-          name: "SilverWing Pension",
-          type: "Pension Fund",
-          initials: "SW",
-          assets: 1.8,
-          changePercent: 9.2
-        },
-        {
-          id: 3,
-          name: "Horizon Insurance",
-          type: "Insurance",
-          initials: "HI",
-          assets: 1.2,
-          changePercent: 7.8
-        },
-        {
-          id: 4,
-          name: "BlueRock Asset Mgmt",
-          type: "Asset Manager",
-          initials: "BR",
-          assets: 0.985,
-          changePercent: 6.5
-        }
-      ];
+      // Past 12 months data
+      const now = new Date();
+      const data = [];
       
-      res.json(clients);
+      for (let i = 11; i >= 0; i--) {
+        const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
+        const amount = 2.2 + Math.random() * 0.8 + (i * 0.05);
+        
+        data.push({
+          date: date.toISOString(),
+          amount: parseFloat(amount.toFixed(2))
+        });
+      }
+      
+      res.json(data);
     } catch (error) {
-      res.status(500).json({ message: "Failed to fetch top clients" });
+      res.status(500).json({ message: "Failed to fetch income history data" });
     }
   });
 
-  // Risk Metrics endpoint
-  app.get("/api/risk-metrics", async (_req, res) => {
+  // Top Revenue Customers endpoint
+  app.get("/api/top-customers", async (_req, res) => {
     try {
-      const riskMetrics = [
+      const topCustomers = [
         {
           id: 1,
-          name: "Value at Risk (VaR)",
-          current: "$124.5M",
-          previous: "$118.3M",
-          changePercent: 5.2,
-          status: "Monitor"
+          name: "GlobalTech Pension",
+          customerType: "Pension Fund",
+          revenue: 2.48,
+          assets: 12.5,
+          changePercent: 8.2
         },
         {
           id: 2,
-          name: "Sharpe Ratio",
-          current: "1.42",
-          previous: "1.38",
-          changePercent: 2.9,
-          status: "Acceptable"
+          name: "Eastbrook Investments",
+          customerType: "Asset Manager",
+          revenue: 1.95,
+          assets: 10.3,
+          changePercent: 6.4
         },
         {
           id: 3,
-          name: "Volatility",
-          current: "12.4%",
-          previous: "11.8%",
-          changePercent: 5.1,
-          status: "Monitor"
+          name: "Atlantic Insurance Ltd",
+          customerType: "Insurance",
+          revenue: 1.62,
+          assets: 8.7,
+          changePercent: 5.3
         },
         {
           id: 4,
-          name: "Liquidity Ratio",
-          current: "1.85",
-          previous: "1.72",
-          changePercent: 7.6,
-          status: "Acceptable"
+          name: "Summit Wealth Partners",
+          customerType: "HNW Family Office",
+          revenue: 1.24,
+          assets: 6.8,
+          changePercent: 4.9
+        },
+        {
+          id: 5,
+          name: "Pacific Financial Group",
+          customerType: "Institutional",
+          revenue: 1.05,
+          assets: 5.9,
+          changePercent: 3.7
         }
       ];
       
-      res.json(riskMetrics);
+      res.json(topCustomers);
     } catch (error) {
-      res.status(500).json({ message: "Failed to fetch risk metrics" });
-    }
-  });
-
-  // Security Alerts endpoint
-  app.get("/api/security-alerts", async (_req, res) => {
-    try {
-      const securityAlerts = [
-        {
-          id: 1,
-          title: "Critical Risk Threshold Exceeded",
-          description: "Portfolio D-27 exposure to technology sector exceeds 35% threshold.",
-          timeAgo: "2h ago",
-          severity: "critical"
-        },
-        {
-          id: 2,
-          title: "Settlement Delay Warning",
-          description: "International bond transaction settlement delayed by 24 hours.",
-          timeAgo: "4h ago",
-          severity: "warning"
-        },
-        {
-          id: 3,
-          title: "Account Access Notification",
-          description: "New device login detected for admin account. Please verify.",
-          timeAgo: "8h ago",
-          severity: "info"
-        },
-        {
-          id: 4,
-          title: "Regulatory Compliance Update",
-          description: "All client accounts successfully updated to comply with new regulations.",
-          timeAgo: "1d ago",
-          severity: "success"
-        }
-      ];
-      
-      res.json(securityAlerts);
-    } catch (error) {
-      res.status(500).json({ message: "Failed to fetch security alerts" });
+      res.status(500).json({ message: "Failed to fetch top customers" });
     }
   });
 
