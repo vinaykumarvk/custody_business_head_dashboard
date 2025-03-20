@@ -81,8 +81,28 @@ export class PostgresStorage implements IStorage {
 
   // Dashboard data methods
   async getCustomerMetrics(): Promise<CustomerMetrics | undefined> {
-    const result = await db.select().from(customerMetrics);
-    return result[0];
+    // Get customer history data
+    const history = await this.getCustomerHistory();
+    
+    // If no history data, return from customerMetrics table (fallback)
+    if (history.length === 0) {
+      const result = await db.select().from(customerMetrics);
+      return result[0];
+    }
+    
+    // Get the most recent customer history record
+    const latestData = history.sort((a, b) => 
+      new Date(b.date).getTime() - new Date(a.date).getTime()
+    )[0];
+    
+    // Return metrics based on latest customer history data
+    return {
+      id: 1,
+      totalCustomers: latestData.totalCustomers,
+      activeCustomers: latestData.active,
+      newCustomersMTD: latestData.newCustomers,
+      date: new Date()
+    };
   }
 
   async getCustomerGrowth(): Promise<CustomerGrowth[]> {
