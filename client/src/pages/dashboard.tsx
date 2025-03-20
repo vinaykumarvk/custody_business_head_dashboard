@@ -163,12 +163,7 @@ export default function Dashboard() {
 
   return (
     <div className="bg-custodyBackground min-h-screen font-roboto">
-      <div className="container mx-auto px-4 py-4">
-        <div className="mb-6">
-          <h1 className="text-2xl font-bold text-custodyBlue font-roboto">Custody Services Dashboard</h1>
-          <p className="text-custodyGray mt-1">Business Head Overview for Custody Services</p>
-        </div>
-        
+      <div className="container mx-auto px-4 py-4 w-2/3 max-w-5xl">
         {/* Display any errors */}
         {customerMetricsError && renderErrorAlert("Failed to load customer metrics")}
         {aucMetricsError && renderErrorAlert("Failed to load AUC metrics")}
@@ -241,7 +236,6 @@ export default function Dashboard() {
           {topCustomersError && renderErrorAlert("Failed to load top customers data")}
           
           <div className="bg-white p-5 rounded-md shadow-sm">
-            <h3 className="text-lg font-medium text-custodyBlue mb-4 font-roboto">Top Customers</h3>
             {topCustomersLoading ? (
               <div className="animate-pulse h-80 bg-gray-200 rounded-md"></div>
             ) : topCustomers ? (

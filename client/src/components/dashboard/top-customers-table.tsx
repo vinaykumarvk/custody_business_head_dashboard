@@ -30,7 +30,7 @@ const TopCustomersTable: React.FC<TopCustomersTableProps> = ({ customers }) => {
 
   return (
     <div>
-      <h2 className="text-lg font-semibold text-gray-900 mb-4">Top Revenue Customers</h2>
+      <h2 className="text-lg font-semibold text-gray-900 mb-4">Top Customers</h2>
       <div className="border rounded-lg overflow-hidden">
         <Table>
           <TableHeader>

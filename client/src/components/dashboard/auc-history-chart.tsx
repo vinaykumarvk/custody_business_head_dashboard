@@ -61,26 +61,34 @@ const AucHistoryChart: React.FC<AucHistoryChartProps> = ({ data }) => {
           {
             label: 'Equity',
             data: equityData,
-            backgroundColor: '#2448a5', // Blue
-            stack: 'Stack 0'
+            backgroundColor: '#1E40AF', // Deeper blue
+            stack: 'Stack 0',
+            borderWidth: 1,
+            borderColor: '#fff'
           },
           {
             label: 'Fixed Income',
             data: fixedIncomeData,
-            backgroundColor: '#C6DBFC', // Light Blue
-            stack: 'Stack 0'
+            backgroundColor: '#3B82F6', // Brighter blue
+            stack: 'Stack 0',
+            borderWidth: 1,
+            borderColor: '#fff'
           },
           {
             label: 'Mutual Funds',
             data: mutualFundsData,
-            backgroundColor: '#7b7b7b', // Gray
-            stack: 'Stack 0'
+            backgroundColor: '#4CAF50', // Green
+            stack: 'Stack 0',
+            borderWidth: 1,
+            borderColor: '#fff'
           },
           {
             label: 'Others',
             data: othersData,
-            backgroundColor: '#90CAF9', // Another shade of blue
-            stack: 'Stack 0'
+            backgroundColor: '#93C5FD', // Light blue
+            stack: 'Stack 0',
+            borderWidth: 1,
+            borderColor: '#fff'
           }
         ]
       },
