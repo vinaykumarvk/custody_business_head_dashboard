@@ -168,3 +168,21 @@ export const insertTopCustomersSchema = createInsertSchema(topCustomers).omit({
 
 export type InsertTopCustomers = z.infer<typeof insertTopCustomersSchema>;
 export type TopCustomers = typeof topCustomers.$inferSelect;
+
+// Monthly Customer Data schema - tracks customer segments by month
+export const monthlyCustomerData = pgTable("monthly_customer_data", {
+  id: serial("id").primaryKey(),
+  month: timestamp("month").notNull(),
+  institutional: integer("institutional").notNull(),
+  corporate: integer("corporate").notNull(),
+  hni: integer("hni").notNull(),
+  funds: integer("funds").notNull(),
+  activeCustomers: integer("active_customers").notNull(),
+});
+
+export const insertMonthlyCustomerDataSchema = createInsertSchema(monthlyCustomerData).omit({
+  id: true,
+});
+
+export type InsertMonthlyCustomerData = z.infer<typeof insertMonthlyCustomerDataSchema>;
+export type MonthlyCustomerData = typeof monthlyCustomerData.$inferSelect;

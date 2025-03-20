@@ -9,7 +9,8 @@ import {
   income, type Income, type InsertIncome,
   incomeByService, type IncomeByService, type InsertIncomeByService,
   incomeHistory, type IncomeHistory, type InsertIncomeHistory,
-  topCustomers, type TopCustomers, type InsertTopCustomers
+  topCustomers, type TopCustomers, type InsertTopCustomers,
+  monthlyCustomerData, type MonthlyCustomerData, type InsertMonthlyCustomerData
 } from "@shared/schema";
 import { eq } from 'drizzle-orm';
 import { drizzle } from 'drizzle-orm/postgres-js';
@@ -40,6 +41,15 @@ export interface IStorage {
   getIncomeByService(): Promise<IncomeByService[]>;
   getIncomeHistory(): Promise<IncomeHistory[]>;
   getTopCustomers(): Promise<TopCustomers[]>;
+  
+  // Monthly customer data methods
+  getMonthlyCustomerData(): Promise<MonthlyCustomerData[]>;
+  createMonthlyCustomerData(data: InsertMonthlyCustomerData): Promise<MonthlyCustomerData>;
+  
+  // Derived customer metrics methods
+  calculateDerivedCustomerMetrics(dataPoints: MonthlyCustomerData[]): Promise<CustomerMetrics>;
+  calculateCustomerGrowth(dataPoints: MonthlyCustomerData[]): Promise<CustomerGrowth[]>;
+  calculateCustomerSegments(dataPoint: MonthlyCustomerData): Promise<CustomerSegments[]>;
 
   // Seed the database with initial mock data
   seedDatabase(): Promise<void>;
@@ -113,6 +123,130 @@ export class PostgresStorage implements IStorage {
   async getTopCustomers(): Promise<TopCustomers[]> {
     const result = await db.select().from(topCustomers);
     return result;
+  }
+  
+  // Monthly customer data methods
+  async getMonthlyCustomerData(): Promise<MonthlyCustomerData[]> {
+    const result = await db.select().from(monthlyCustomerData);
+    return result;
+  }
+  
+  async createMonthlyCustomerData(data: InsertMonthlyCustomerData): Promise<MonthlyCustomerData> {
+    const result = await db.insert(monthlyCustomerData).values(data).returning();
+    return result[0];
+  }
+  
+  // Derived customer metrics methods
+  async calculateDerivedCustomerMetrics(dataPoints: MonthlyCustomerData[]): Promise<CustomerMetrics> {
+    if (dataPoints.length === 0) {
+      throw new Error("No monthly customer data available");
+    }
+    
+    // Get the latest month data
+    const latestData = dataPoints.sort((a, b) => 
+      new Date(b.month).getTime() - new Date(a.month).getTime()
+    )[0];
+    
+    // Calculate total customers as sum of all segments
+    const totalCustomers = latestData.institutional + latestData.corporate + 
+      latestData.hni + latestData.funds;
+    
+    // Calculate new customers by comparing with previous month
+    let newCustomersMTD = 0;
+    if (dataPoints.length > 1) {
+      const previousData = dataPoints.sort((a, b) => 
+        new Date(b.month).getTime() - new Date(a.month).getTime()
+      )[1];
+      
+      const previousTotal = previousData.institutional + previousData.corporate + 
+        previousData.hni + previousData.funds;
+        
+      newCustomersMTD = Math.max(0, totalCustomers - previousTotal);
+    }
+    
+    // Active customers is already part of the monthly data
+    const activeCustomers = latestData.activeCustomers;
+    
+    return {
+      id: 1, // This will be overwritten for database persistence
+      totalCustomers,
+      activeCustomers,
+      newCustomersMTD,
+      date: new Date()
+    };
+  }
+  
+  async calculateCustomerGrowth(dataPoints: MonthlyCustomerData[]): Promise<CustomerGrowth[]> {
+    if (dataPoints.length === 0) {
+      return [];
+    }
+    
+    // Sort by date, oldest first
+    const sortedData = dataPoints.sort((a, b) => 
+      new Date(a.month).getTime() - new Date(b.month).getTime()
+    );
+    
+    const result: { date: Date, totalCustomers: number, newCustomers: number }[] = [];
+    
+    for (let i = 0; i < sortedData.length; i++) {
+      const current = sortedData[i];
+      const totalCustomers = current.institutional + current.corporate + 
+        current.hni + current.funds;
+        
+      let newCustomers = 0;
+      if (i > 0) {
+        const previous = sortedData[i-1];
+        const previousTotal = previous.institutional + previous.corporate + 
+          previous.hni + previous.funds;
+          
+        newCustomers = Math.max(0, totalCustomers - previousTotal);
+      } else {
+        // For the first month, use 5% of total as new customers
+        newCustomers = Math.round(totalCustomers * 0.05);
+      }
+      
+      result.push({
+        date: new Date(current.month),
+        totalCustomers,
+        newCustomers
+      });
+    }
+    
+    return result;
+  }
+  
+  async calculateCustomerSegments(dataPoint: MonthlyCustomerData): Promise<CustomerSegments[]> {
+    // Calculate total
+    const total = dataPoint.institutional + dataPoint.corporate + 
+      dataPoint.hni + dataPoint.funds;
+      
+    if (total === 0) {
+      throw new Error("Total customers cannot be zero");
+    }
+    
+    // Calculate percentages
+    return [
+      {
+        id: 1, // This will be overwritten for database persistence
+        segmentName: "Institutional",
+        percentage: ((dataPoint.institutional / total) * 100).toFixed(1)
+      },
+      {
+        id: 2,
+        segmentName: "Corporate",
+        percentage: ((dataPoint.corporate / total) * 100).toFixed(1)
+      },
+      {
+        id: 3,
+        segmentName: "High Net Worth",
+        percentage: ((dataPoint.hni / total) * 100).toFixed(1)
+      },
+      {
+        id: 4,
+        segmentName: "Funds",
+        percentage: ((dataPoint.funds / total) * 100).toFixed(1)
+      }
+    ];
   }
 
   // Helper methods to generate consistent mock data
