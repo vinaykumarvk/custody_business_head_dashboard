@@ -1,44 +1,73 @@
-import { useQuery } from "@tanstack/react-query";
+import React from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { FiUsers, FiUserPlus, FiDollarSign, FiBarChart2 } from 'react-icons/fi';
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { AlertCircle } from "lucide-react";
 
-import KpiCard from "@/components/dashboard/kpi-card";
-import AssetPerformanceChart from "@/components/dashboard/asset-performance-chart";
-import AssetAllocationChart from "@/components/dashboard/asset-allocation-chart";
-import TransactionsTable from "@/components/dashboard/transactions-table";
-import TopClients from "@/components/dashboard/top-clients";
-import RiskMetrics from "@/components/dashboard/risk-metrics";
-import SecurityAlerts from "@/components/dashboard/security-alerts";
+import MetricCard from '@/components/dashboard/metric-card';
+import CustomerGrowthChart from '@/components/dashboard/customer-growth-chart';
+import CustomerSegmentsChart from '@/components/dashboard/customer-segments-chart';
+import TradingVolumeChart from '@/components/dashboard/trading-volume-chart';
+import AucHistoryChart from '@/components/dashboard/auc-history-chart';
+import IncomeHistoryChart from '@/components/dashboard/income-history-chart';
+import IncomeByServiceChart from '@/components/dashboard/income-by-service-chart';
+import TopCustomersTable from '@/components/dashboard/top-customers-table';
 
 export default function Dashboard() {
-  const { data: kpiData, isLoading: isLoadingKpi, error: kpiError } = useQuery({
-    queryKey: ['/api/kpi-metrics'],
+  // Customer Metrics
+  const { data: customerMetrics, isLoading: customerMetricsLoading, error: customerMetricsError } = useQuery({
+    queryKey: ['/api/customer-metrics'],
   });
 
-  const { data: allocationData, isLoading: isLoadingAllocation, error: allocationError } = useQuery({
-    queryKey: ['/api/asset-allocation'],
+  // Customer Growth
+  const { data: customerGrowth, isLoading: customerGrowthLoading, error: customerGrowthError } = useQuery({
+    queryKey: ['/api/customer-growth'],
   });
 
-  const { data: performanceData, isLoading: isLoadingPerformance, error: performanceError } = useQuery({
-    queryKey: ['/api/asset-performance'],
+  // Customer Segments
+  const { data: customerSegments, isLoading: customerSegmentsLoading, error: customerSegmentsError } = useQuery({
+    queryKey: ['/api/customer-segments'],
   });
 
-  const { data: transactionsData, isLoading: isLoadingTransactions, error: transactionsError } = useQuery({
-    queryKey: ['/api/transactions'],
-  });
-  
-  const { data: clientsData, isLoading: isLoadingClients, error: clientsError } = useQuery({
-    queryKey: ['/api/top-clients'],
+  // Trading Volume
+  const { data: tradingVolume, isLoading: tradingVolumeLoading, error: tradingVolumeError } = useQuery({
+    queryKey: ['/api/trading-volume'],
   });
 
-  const { data: riskMetricsData, isLoading: isLoadingRiskMetrics, error: riskMetricsError } = useQuery({
-    queryKey: ['/api/risk-metrics'],
+  // AUC History
+  const { data: aucHistory, isLoading: aucHistoryLoading, error: aucHistoryError } = useQuery({
+    queryKey: ['/api/auc-history'],
   });
 
-  const { data: securityAlertsData, isLoading: isLoadingSecurityAlerts, error: securityAlertsError } = useQuery({
-    queryKey: ['/api/security-alerts'],
+  // AUC Metrics
+  const { data: aucMetrics, isLoading: aucMetricsLoading, error: aucMetricsError } = useQuery({
+    queryKey: ['/api/auc-metrics'],
   });
+
+  // Income data
+  const { data: income, isLoading: incomeLoading, error: incomeError } = useQuery({
+    queryKey: ['/api/income'],
+  });
+
+  // Income by Service
+  const { data: incomeByService, isLoading: incomeByServiceLoading, error: incomeByServiceError } = useQuery({
+    queryKey: ['/api/income-by-service'],
+  });
+
+  // Income History
+  const { data: incomeHistory, isLoading: incomeHistoryLoading, error: incomeHistoryError } = useQuery({
+    queryKey: ['/api/income-history'],
+  });
+
+  // Top Customers
+  const { data: topCustomers, isLoading: topCustomersLoading, error: topCustomersError } = useQuery({
+    queryKey: ['/api/top-customers'],
+  });
+
+  const formatNumberWithCommas = (value: number) => {
+    return value?.toLocaleString() || '';
+  };
 
   const renderErrorAlert = (message: string) => (
     <Alert variant="destructive" className="mb-4">
@@ -49,178 +78,164 @@ export default function Dashboard() {
   );
 
   return (
-    <div className="container mx-auto py-6 px-4 md:px-6 bg-[#f5f7fa] min-h-screen">
-      <h1 className="text-2xl md:text-3xl font-bold text-primary mb-6">Custody Security Business Dashboard</h1>
-      
-      {kpiError && renderErrorAlert("Failed to load KPI metrics")}
-      
-      {/* KPI Summary Section */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        {isLoadingKpi ? (
-          Array(4).fill(0).map((_, i) => (
-            <div key={i} className="bg-white rounded-lg shadow p-5">
-              <Skeleton className="h-5 w-32 mb-2" />
-              <Skeleton className="h-8 w-24 mb-2" />
-              <Skeleton className="h-4 w-32" />
-            </div>
-          ))
-        ) : kpiData ? (
-          <>
-            <KpiCard 
-              title="Assets Under Management"
-              value={`$${kpiData.aum}B`}
-              change={kpiData.aumChangePercent}
-              icon="funds"
-            />
-            <KpiCard 
-              title="Total Transactions"
-              value={kpiData.transactions.toLocaleString()}
-              change={kpiData.transactionsChangePercent}
-              icon="exchange-funds"
-            />
-            <KpiCard 
-              title="Active Clients"
-              value={kpiData.clients.toLocaleString()}
-              change={kpiData.clientsChangePercent}
-              icon="user-star"
-            />
-            <KpiCard 
-              title="Revenue"
-              value={`$${kpiData.revenue}M`}
-              change={kpiData.revenueChangePercent}
-              icon="money-dollar-circle"
-            />
-          </>
-        ) : null}
-      </div>
-      
-      {/* Chart & Performance Section */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-        {/* Performance Chart */}
-        {performanceError && renderErrorAlert("Failed to load performance data")}
-        <div className="card bg-white rounded-lg shadow p-5 lg:col-span-2">
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-lg font-semibold text-neutral-dark">Assets Performance Trend</h2>
-            <div className="flex space-x-2">
-              <button className="px-3 py-1 text-xs font-medium bg-primary-light text-primary rounded-full">1M</button>
-              <button className="px-3 py-1 text-xs font-medium text-[#7b7b7b] rounded-full">3M</button>
-              <button className="px-3 py-1 text-xs font-medium text-[#7b7b7b] rounded-full">6M</button>
-              <button className="px-3 py-1 text-xs font-medium text-[#7b7b7b] rounded-full">1Y</button>
-            </div>
+    <div className="bg-[#F8FAFC] min-h-screen">
+      <div className="container mx-auto px-4 py-8">
+        <h1 className="text-2xl font-bold text-[#2448a5] mb-8">Custody Business Dashboard</h1>
+        
+        {customerMetricsError && renderErrorAlert("Failed to load customer metrics")}
+        {aucMetricsError && renderErrorAlert("Failed to load AUC metrics")}
+        
+        {/* Customer Metrics */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          {customerMetricsLoading || aucMetricsLoading ? (
+            Array(4).fill(0).map((_, i) => (
+              <div key={i} className="bg-white rounded-lg shadow p-5">
+                <Skeleton className="h-5 w-32 mb-2" />
+                <Skeleton className="h-8 w-24 mb-2" />
+                <Skeleton className="h-4 w-32" />
+              </div>
+            ))
+          ) : (
+            <>
+              <MetricCard 
+                title="Total Customers" 
+                value={formatNumberWithCommas(customerMetrics?.totalCustomers)}
+                icon={<FiUsers size={24} color="#2448a5" />}
+              />
+              
+              <MetricCard 
+                title="Active Customers" 
+                value={formatNumberWithCommas(customerMetrics?.activeCustomers)}
+                icon={<FiUsers size={24} color="#2448a5" />}
+                subtitle="Monthly active customers"
+              />
+              
+              <MetricCard 
+                title="New Customers MTD" 
+                value={formatNumberWithCommas(customerMetrics?.newCustomersMTD)}
+                icon={<FiUserPlus size={24} color="#2448a5" />}
+                change={4.7}
+              />
+              
+              <MetricCard 
+                title="AUC (Assets Under Custody)" 
+                value={`$${aucMetrics?.totalAuc}B`}
+                icon={<FiBarChart2 size={24} color="#2448a5" />}
+                change={5.2}
+              />
+            </>
+          )}
+        </div>
+        
+        {customerGrowthError && renderErrorAlert("Failed to load customer growth data")}
+        {customerSegmentsError && renderErrorAlert("Failed to load customer segments data")}
+        
+        {/* Second row */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+          <div className="bg-white p-6 rounded-lg shadow col-span-2">
+            {customerGrowthLoading ? (
+              <div className="animate-pulse h-80 bg-gray-200 rounded"></div>
+            ) : customerGrowth ? (
+              <CustomerGrowthChart data={customerGrowth} />
+            ) : null}
           </div>
           
-          {isLoadingPerformance ? (
-            <Skeleton className="h-80 w-full" />
-          ) : performanceData ? (
-            <AssetPerformanceChart data={performanceData} />
+          <div className="bg-white p-6 rounded-lg shadow">
+            {customerSegmentsLoading ? (
+              <div className="animate-pulse h-60 bg-gray-200 rounded"></div>
+            ) : customerSegments ? (
+              <CustomerSegmentsChart data={customerSegments} />
+            ) : null}
+          </div>
+        </div>
+        
+        {tradingVolumeError && renderErrorAlert("Failed to load trading volume data")}
+        {aucHistoryError && renderErrorAlert("Failed to load AUC history data")}
+        
+        {/* Third row */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+          <div className="bg-white p-6 rounded-lg shadow">
+            {tradingVolumeLoading ? (
+              <div className="animate-pulse h-80 bg-gray-200 rounded"></div>
+            ) : tradingVolume ? (
+              <TradingVolumeChart data={tradingVolume} />
+            ) : null}
+          </div>
+          
+          <div className="bg-white p-6 rounded-lg shadow">
+            {aucHistoryLoading ? (
+              <div className="animate-pulse h-80 bg-gray-200 rounded"></div>
+            ) : aucHistory ? (
+              <AucHistoryChart data={aucHistory} />
+            ) : null}
+          </div>
+        </div>
+        
+        {incomeError && renderErrorAlert("Failed to load income data")}
+        
+        {/* Income Metrics */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          {incomeLoading ? (
+            Array(2).fill(0).map((_, i) => (
+              <div key={i} className="bg-white rounded-lg shadow p-5">
+                <Skeleton className="h-5 w-32 mb-2" />
+                <Skeleton className="h-8 w-24 mb-2" />
+                <Skeleton className="h-4 w-32" />
+              </div>
+            ))
+          ) : income ? (
+            <>
+              <MetricCard 
+                title="Income MTD" 
+                value={`$${income.incomeMTD}M`}
+                icon={<FiDollarSign size={24} color="#2448a5" />}
+                change={3.8}
+              />
+              
+              <MetricCard 
+                title="Outstanding Fees" 
+                value={`$${income.outstandingFees}M`}
+                icon={<FiDollarSign size={24} color="#2448a5" />}
+                change={-2.1}
+              />
+              
+              <div className="col-span-2">
+                {/* Placeholder for future metrics */}
+              </div>
+            </>
           ) : null}
         </div>
         
-        {/* Asset Allocation Chart */}
-        {allocationError && renderErrorAlert("Failed to load allocation data")}
-        <div className="card bg-white rounded-lg shadow p-5">
-          <h2 className="text-lg font-semibold text-neutral-dark mb-4">Asset Allocation</h2>
-          
-          {isLoadingAllocation ? (
-            <Skeleton className="h-60 w-full mb-4" />
-          ) : allocationData ? (
-            <AssetAllocationChart data={allocationData} />
-          ) : null}
-        </div>
-      </div>
-      
-      {/* Recent Transactions Section */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-        {/* Transactions Table */}
-        {transactionsError && renderErrorAlert("Failed to load transactions")}
-        <div className="card bg-white rounded-lg shadow p-5 lg:col-span-2">
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-lg font-semibold text-neutral-dark">Recent Transactions</h2>
-            <button className="text-sm text-primary font-medium">View All</button>
+        {incomeHistoryError && renderErrorAlert("Failed to load income history data")}
+        {incomeByServiceError && renderErrorAlert("Failed to load income by service data")}
+        
+        {/* Fourth row */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+          <div className="bg-white p-6 rounded-lg shadow col-span-2">
+            {incomeHistoryLoading ? (
+              <div className="animate-pulse h-80 bg-gray-200 rounded"></div>
+            ) : incomeHistory ? (
+              <IncomeHistoryChart data={incomeHistory} />
+            ) : null}
           </div>
           
-          {isLoadingTransactions ? (
-            <div className="space-y-3">
-              <Skeleton className="h-10 w-full" />
-              <Skeleton className="h-10 w-full" />
-              <Skeleton className="h-10 w-full" />
-              <Skeleton className="h-10 w-full" />
-            </div>
-          ) : transactionsData ? (
-            <TransactionsTable transactions={transactionsData} />
-          ) : null}
+          <div className="bg-white p-6 rounded-lg shadow">
+            {incomeByServiceLoading ? (
+              <div className="animate-pulse h-60 bg-gray-200 rounded"></div>
+            ) : incomeByService ? (
+              <IncomeByServiceChart data={incomeByService} />
+            ) : null}
+          </div>
         </div>
         
-        {/* Top Clients */}
-        {clientsError && renderErrorAlert("Failed to load clients data")}
-        <div className="card bg-white rounded-lg shadow p-5">
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-lg font-semibold text-neutral-dark">Top Performing Clients</h2>
-            <button className="text-sm text-primary font-medium">View All</button>
-          </div>
-          
-          {isLoadingClients ? (
-            <div className="space-y-4">
-              {Array(4).fill(0).map((_, i) => (
-                <div key={i} className="flex items-center justify-between">
-                  <div className="flex items-center">
-                    <Skeleton className="h-10 w-10 rounded-full" />
-                    <div className="ml-3">
-                      <Skeleton className="h-4 w-32 mb-1" />
-                      <Skeleton className="h-3 w-24" />
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <Skeleton className="h-4 w-16 mb-1" />
-                    <Skeleton className="h-3 w-12" />
-                  </div>
-                </div>
-              ))}
-            </div>
-          ) : clientsData ? (
-            <TopClients clients={clientsData} />
-          ) : null}
-        </div>
-      </div>
-      
-      {/* Risk Metrics & Security Alerts */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Risk Metrics Table */}
-        {riskMetricsError && renderErrorAlert("Failed to load risk metrics")}
-        <div className="card bg-white rounded-lg shadow p-5 lg:col-span-2">
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-lg font-semibold text-neutral-dark">Risk Metrics</h2>
-            <button className="text-sm text-primary font-medium">Export</button>
-          </div>
-          
-          {isLoadingRiskMetrics ? (
-            <div className="space-y-3">
-              <Skeleton className="h-10 w-full" />
-              <Skeleton className="h-10 w-full" />
-              <Skeleton className="h-10 w-full" />
-              <Skeleton className="h-10 w-full" />
-            </div>
-          ) : riskMetricsData ? (
-            <RiskMetrics metrics={riskMetricsData} />
-          ) : null}
-        </div>
+        {topCustomersError && renderErrorAlert("Failed to load top customers data")}
         
-        {/* Security Alerts */}
-        {securityAlertsError && renderErrorAlert("Failed to load security alerts")}
-        <div className="card bg-white rounded-lg shadow p-5">
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-lg font-semibold text-neutral-dark">Security Alerts</h2>
-            <button className="text-sm text-primary font-medium">View All</button>
-          </div>
-          
-          {isLoadingSecurityAlerts ? (
-            <div className="space-y-4">
-              {Array(4).fill(0).map((_, i) => (
-                <Skeleton key={i} className="h-20 w-full" />
-              ))}
-            </div>
-          ) : securityAlertsData ? (
-            <SecurityAlerts alerts={securityAlertsData} />
+        {/* Top Customers Table */}
+        <div className="bg-white p-6 rounded-lg shadow mb-8">
+          {topCustomersLoading ? (
+            <div className="animate-pulse h-80 bg-gray-200 rounded"></div>
+          ) : topCustomers ? (
+            <TopCustomersTable customers={topCustomers} />
           ) : null}
         </div>
       </div>
