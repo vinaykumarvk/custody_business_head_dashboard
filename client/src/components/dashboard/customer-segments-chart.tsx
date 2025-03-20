@@ -4,7 +4,7 @@ import Chart from 'chart.js/auto';
 interface CustomerSegment {
   id: number;
   segmentName: string;
-  percentage: number;
+  percentage: string | number;
 }
 
 interface CustomerSegmentsChartProps {
@@ -27,7 +27,12 @@ const CustomerSegmentsChart: React.FC<CustomerSegmentsChartProps> = ({ data }) =
     if (!ctx) return;
 
     const labels = data.map(segment => segment.segmentName);
-    const percentages = data.map(segment => segment.percentage);
+    const percentages = data.map(segment => {
+      // Convert percentage to number if it's a string
+      return typeof segment.percentage === 'string' 
+        ? parseFloat(segment.percentage) 
+        : segment.percentage;
+    });
 
     chartInstance.current = new Chart(ctx, {
       type: 'doughnut',

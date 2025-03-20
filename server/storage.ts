@@ -199,150 +199,181 @@ export class PostgresStorage implements IStorage {
   // Method to seed the database with initial data
   async seedDatabase() {
     try {
-      // Check if tables have data already
+      console.log("Checking database status...");
+      
+      // Check each table and seed only if empty
+      // This way we don't lose data if one table fails to seed
+      
+      // Customer Metrics
       const existingMetrics = await db.select().from(customerMetrics);
-      if (existingMetrics.length > 0) {
-        console.log("Database already seeded");
-        return;
-      }
-
-      console.log("Seeding database with initial data...");
-      
-      // Insert customer metrics
-      await db.insert(customerMetrics).values({
-        totalCustomers: 12450,
-        activeCustomers: 10230,
-        newCustomersMTD: 175,
-        date: new Date()
-      });
-      
-      // Insert customer growth
-      for (const growth of this.generateMockCustomerGrowth()) {
-        await db.insert(customerGrowth).values(growth);
-      }
-      
-      // Insert customer segments
-      await db.insert(customerSegments).values({
-        segmentName: "Institutional", 
-        percentage: "45"
-      });
-      await db.insert(customerSegments).values({
-        segmentName: "Pension Funds", 
-        percentage: "25"
-      });
-      await db.insert(customerSegments).values({
-        segmentName: "High Net Worth", 
-        percentage: "20"
-      });
-      await db.insert(customerSegments).values({
-        segmentName: "Retail", 
-        percentage: "10"
-      });
-      
-      // Insert trading volume
-      for (const volume of this.generateMockTradingVolume()) {
-        await db.insert(tradingVolume).values({
-          date: volume.date,
-          volume: volume.volume.toString()
+      if (existingMetrics.length === 0) {
+        console.log("Seeding customer metrics...");
+        await db.insert(customerMetrics).values({
+          totalCustomers: 12450,
+          activeCustomers: 10230,
+          newCustomersMTD: 175,
+          date: new Date()
         });
       }
       
-      // Insert AUC history
-      for (const history of this.generateMockAucHistory()) {
-        await db.insert(aucHistory).values({
-          date: history.date,
-          equity: history.equity.toString(),
-          fixedIncome: history.fixedIncome.toString(),
-          mutualFunds: history.mutualFunds.toString(),
-          others: history.others.toString()
+      // Customer Growth
+      const existingGrowth = await db.select().from(customerGrowth);
+      if (existingGrowth.length === 0) {
+        console.log("Seeding customer growth...");
+        for (const growth of this.generateMockCustomerGrowth()) {
+          await db.insert(customerGrowth).values({
+            date: growth.date,
+            totalCustomers: growth.totalCustomers,
+            newCustomers: growth.newCustomers
+          });
+        }
+      }
+      
+      // Customer Segments
+      const existingSegments = await db.select().from(customerSegments);
+      if (existingSegments.length === 0) {
+        console.log("Seeding customer segments...");
+        const segments = [
+          { segmentName: "Institutional", percentage: "45" },
+          { segmentName: "Pension Funds", percentage: "25" },
+          { segmentName: "High Net Worth", percentage: "20" },
+          { segmentName: "Retail", percentage: "10" }
+        ];
+        
+        for (const segment of segments) {
+          await db.insert(customerSegments).values(segment);
+        }
+      }
+      
+      // Trading Volume
+      const existingVolume = await db.select().from(tradingVolume);
+      if (existingVolume.length === 0) {
+        console.log("Seeding trading volume...");
+        for (const volume of this.generateMockTradingVolume()) {
+          await db.insert(tradingVolume).values({
+            date: volume.date,
+            volume: volume.volume.toString()
+          });
+        }
+      }
+      
+      // AUC History
+      const existingAucHistory = await db.select().from(aucHistory);
+      if (existingAucHistory.length === 0) {
+        console.log("Seeding AUC history...");
+        for (const history of this.generateMockAucHistory()) {
+          await db.insert(aucHistory).values({
+            date: history.date,
+            equity: history.equity.toString(),
+            fixedIncome: history.fixedIncome.toString(),
+            mutualFunds: history.mutualFunds.toString(),
+            others: history.others.toString()
+          });
+        }
+      }
+      
+      // AUC Metrics
+      const existingAucMetrics = await db.select().from(aucMetrics);
+      if (existingAucMetrics.length === 0) {
+        console.log("Seeding AUC metrics...");
+        await db.insert(aucMetrics).values({
+          totalAuc: "104.5",
+          equity: "48.2",
+          fixedIncome: "38.1",
+          mutualFunds: "10.2",
+          others: "8.0"
         });
       }
       
-      // Insert AUC metrics
-      await db.insert(aucMetrics).values({
-        totalAuc: "104.5",
-        equity: "48.2",
-        fixedIncome: "38.1",
-        mutualFunds: "10.2",
-        others: "8.0"
-      });
-      
-      // Insert income
-      await db.insert(income).values({
-        incomeMTD: "2.75",
-        outstandingFees: "0.85"
-      });
-      
-      // Insert income by service
-      await db.insert(incomeByService).values({
-        serviceName: "Custody Fees", 
-        amount: "12.4"
-      });
-      await db.insert(incomeByService).values({
-        serviceName: "Transaction Fees", 
-        amount: "8.6"
-      });
-      await db.insert(incomeByService).values({
-        serviceName: "Value Added Services", 
-        amount: "5.2"
-      });
-      await db.insert(incomeByService).values({
-        serviceName: "Reporting & Analytics", 
-        amount: "3.1"
-      });
-      
-      // Insert income history
-      for (const history of this.generateMockIncomeHistory()) {
-        await db.insert(incomeHistory).values({
-          date: history.date,
-          amount: history.amount.toString()
+      // Income
+      const existingIncome = await db.select().from(income);
+      if (existingIncome.length === 0) {
+        console.log("Seeding income...");
+        await db.insert(income).values({
+          incomeMTD: "2.75",
+          outstandingFees: "0.85"
         });
       }
       
-      // Insert top customers
-      await db.insert(topCustomers).values({
-        name: "GlobalTech Pension",
-        customerType: "Pension Fund",
-        revenue: "2.48",
-        assets: "12.5",
-        changePercent: "8.2"
-      });
+      // Income By Service
+      const existingIncomeByService = await db.select().from(incomeByService);
+      if (existingIncomeByService.length === 0) {
+        console.log("Seeding income by service...");
+        const services = [
+          { serviceName: "Custody Fees", amount: "12.4" },
+          { serviceName: "Transaction Fees", amount: "8.6" },
+          { serviceName: "Value Added Services", amount: "5.2" },
+          { serviceName: "Reporting & Analytics", amount: "3.1" }
+        ];
+        
+        for (const service of services) {
+          await db.insert(incomeByService).values(service);
+        }
+      }
       
-      await db.insert(topCustomers).values({
-        name: "Eastbrook Investments",
-        customerType: "Asset Manager",
-        revenue: "1.95",
-        assets: "10.3",
-        changePercent: "6.4"
-      });
+      // Income History
+      const existingIncomeHistory = await db.select().from(incomeHistory);
+      if (existingIncomeHistory.length === 0) {
+        console.log("Seeding income history...");
+        for (const history of this.generateMockIncomeHistory()) {
+          await db.insert(incomeHistory).values({
+            date: history.date,
+            amount: history.amount.toString()
+          });
+        }
+      }
       
-      await db.insert(topCustomers).values({
-        name: "Atlantic Insurance Ltd",
-        customerType: "Insurance",
-        revenue: "1.62",
-        assets: "8.7",
-        changePercent: "5.3"
-      });
-      
-      await db.insert(topCustomers).values({
-        name: "Summit Wealth Partners",
-        customerType: "HNW Family Office",
-        revenue: "1.24",
-        assets: "6.8",
-        changePercent: "4.9"
-      });
-      
-      await db.insert(topCustomers).values({
-        name: "Pacific Financial Group",
-        customerType: "Institutional",
-        revenue: "1.05",
-        assets: "5.9",
-        changePercent: "3.7"
-      });
+      // Top Customers
+      const existingTopCustomers = await db.select().from(topCustomers);
+      if (existingTopCustomers.length === 0) {
+        console.log("Seeding top customers...");
+        const customers = [
+          {
+            name: "GlobalTech Pension",
+            customerType: "Pension Fund",
+            revenue: "2.48",
+            assets: "12.5",
+            changePercent: "8.2"
+          },
+          {
+            name: "Eastbrook Investments",
+            customerType: "Asset Manager",
+            revenue: "1.95",
+            assets: "10.3",
+            changePercent: "6.4"
+          },
+          {
+            name: "Atlantic Insurance Ltd",
+            customerType: "Insurance",
+            revenue: "1.62",
+            assets: "8.7",
+            changePercent: "5.3"
+          },
+          {
+            name: "Summit Wealth Partners",
+            customerType: "HNW Family Office",
+            revenue: "1.24",
+            assets: "6.8",
+            changePercent: "4.9"
+          },
+          {
+            name: "Pacific Financial Group",
+            customerType: "Institutional",
+            revenue: "1.05",
+            assets: "5.9",
+            changePercent: "3.7"
+          }
+        ];
+        
+        for (const customer of customers) {
+          await db.insert(topCustomers).values(customer);
+        }
+      }
       
       console.log("Database seeding completed");
     } catch (error) {
       console.error("Error seeding database:", error);
+      throw error; // Re-throw to allow the caller to handle it
     }
   }
 }

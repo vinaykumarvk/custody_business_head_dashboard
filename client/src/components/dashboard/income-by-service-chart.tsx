@@ -4,7 +4,7 @@ import Chart from 'chart.js/auto';
 interface IncomeByService {
   id: number;
   serviceName: string;
-  amount: number;
+  amount: string | number;
 }
 
 interface IncomeByServiceChartProps {
@@ -27,7 +27,9 @@ const IncomeByServiceChart: React.FC<IncomeByServiceChartProps> = ({ data }) => 
     if (!ctx) return;
 
     const labels = data.map(item => item.serviceName);
-    const amounts = data.map(item => item.amount);
+    const amounts = data.map(item => 
+      typeof item.amount === 'string' ? parseFloat(item.amount) : item.amount
+    );
     const total = amounts.reduce((acc, curr) => acc + curr, 0);
     const percentages = amounts.map(amount => ((amount / total) * 100).toFixed(1));
 
