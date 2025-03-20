@@ -1,6 +1,8 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
+import { db } from "./db";
 import { storage } from "./storage";
+import { customerGrowth } from "@shared/schema";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Dashboard data endpoints
@@ -256,6 +258,63 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error creating customer history record:", error);
       res.status(500).json({ message: "Failed to create customer history record" });
+    }
+  });
+  
+  // Regenerate customer growth data (for data integrity fix)
+  app.post("/api/regenerate-customer-growth", async (_req, res) => {
+    try {
+      // First, clear all existing customer growth data
+      await db.delete(customerGrowth);
+      
+      // Generate new data with proper data integrity
+      const now = new Date();
+      let totalCustomers = 8000; // Starting total for first month
+      
+      // Generate 30 months of data
+      for (let i = 29; i >= 0; i--) {
+        const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
+        
+        // Calculate new customers with realistic variability
+        let newCustomers = 0;
+        
+        // Use patterns that make sense for the business
+        if (i === 29) {
+          // First month - define a reasonable starting point for new customers
+          newCustomers = 400;
+        } else {
+          // Generate reasonable new customer numbers
+          const baseNewCustomers = 80 + Math.sin(i / 2) * 60; // Basic oscillating pattern
+          const seasonalNewCustomers = (i % 3 === 0) ? 350 : 0; // Quarterly spikes
+          const randomNewCustomers = Math.floor(Math.random() * 100); // Random variations
+          
+          // Add market events 
+          const marketEvent = (i === 15) ? 500 : (i === 8) ? 300 : 0; // Specific events
+          
+          // Growth trend - more new customers in later periods
+          const growthTrend = Math.floor((29 - i) / 6) * 50;
+          
+          // Combine factors for new customers (always positive)
+          newCustomers = Math.max(30, Math.floor(baseNewCustomers + seasonalNewCustomers + randomNewCustomers + marketEvent + growthTrend));
+        }
+        
+        // Insert into the database with proper incrementing total customers
+        await db.insert(customerGrowth).values({
+          date: date,
+          totalCustomers: totalCustomers,
+          newCustomers: newCustomers
+        });
+        
+        // Update total customers for next month - ENSURING DATA INTEGRITY
+        if (i > 0) { // For all but the last month
+          totalCustomers = totalCustomers + newCustomers;
+        }
+      }
+      
+      res.json({ message: "Customer growth data regenerated successfully with data integrity" });
+    } catch (error) {
+      console.error("Error regenerating customer growth data:", error);
+      res.status(500).json({ message: "Failed to regenerate customer growth data" });
     }
   });
 
