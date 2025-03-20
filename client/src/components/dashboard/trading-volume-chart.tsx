@@ -14,7 +14,7 @@ interface TradingVolumeChartProps {
 const TradingVolumeChart: React.FC<TradingVolumeChartProps> = ({ data }) => {
   const chartRef = useRef<HTMLCanvasElement>(null);
   const chartInstance = useRef<Chart | null>(null);
-  const [timeRange, setTimeRange] = useState<'1M' | '3M' | '6M' | '1Y'>('1Y');
+  const [timeRange, setTimeRange] = useState<'3M' | '6M' | '1Y' | 'All'>('1Y');
 
   useEffect(() => {
     if (!chartRef.current || !data || data.length === 0) return;
@@ -31,16 +31,17 @@ const TradingVolumeChart: React.FC<TradingVolumeChartProps> = ({ data }) => {
     const now = new Date();
     let filteredData = [...data];
     
-    if (timeRange === '1M') {
-      const lastMonth = subMonths(now, 1);
-      filteredData = data.filter(item => new Date(item.date) >= lastMonth);
-    } else if (timeRange === '3M') {
+    if (timeRange === '3M') {
       const last3Months = subMonths(now, 3);
       filteredData = data.filter(item => new Date(item.date) >= last3Months);
     } else if (timeRange === '6M') {
       const last6Months = subMonths(now, 6);
       filteredData = data.filter(item => new Date(item.date) >= last6Months);
+    } else if (timeRange === '1Y') {
+      const lastYear = subMonths(now, 12);
+      filteredData = data.filter(item => new Date(item.date) >= lastYear);
     }
+    // For 'All', use the complete dataset
 
     const labels = filteredData.map(item => format(new Date(item.date), 'MMM yyyy'));
     const volumes = filteredData.map(item => item.volume);
@@ -116,12 +117,6 @@ const TradingVolumeChart: React.FC<TradingVolumeChartProps> = ({ data }) => {
         <h2 className="text-lg font-semibold text-gray-900">Trading Volume</h2>
         <div className="flex space-x-2">
           <button 
-            className={`px-3 py-1 text-xs font-medium rounded-full ${timeRange === '1M' ? 'bg-[#C6DBFC] text-[#2448a5]' : 'text-[#7b7b7b]'}`}
-            onClick={() => setTimeRange('1M')}
-          >
-            1M
-          </button>
-          <button 
             className={`px-3 py-1 text-xs font-medium rounded-full ${timeRange === '3M' ? 'bg-[#C6DBFC] text-[#2448a5]' : 'text-[#7b7b7b]'}`}
             onClick={() => setTimeRange('3M')}
           >
@@ -138,6 +133,12 @@ const TradingVolumeChart: React.FC<TradingVolumeChartProps> = ({ data }) => {
             onClick={() => setTimeRange('1Y')}
           >
             1Y
+          </button>
+          <button 
+            className={`px-3 py-1 text-xs font-medium rounded-full ${timeRange === 'All' ? 'bg-[#C6DBFC] text-[#2448a5]' : 'text-[#7b7b7b]'}`}
+            onClick={() => setTimeRange('All')}
+          >
+            All
           </button>
         </div>
       </div>

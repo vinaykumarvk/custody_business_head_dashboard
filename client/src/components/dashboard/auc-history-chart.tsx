@@ -17,7 +17,7 @@ interface AucHistoryChartProps {
 const AucHistoryChart: React.FC<AucHistoryChartProps> = ({ data }) => {
   const chartRef = useRef<HTMLCanvasElement>(null);
   const chartInstance = useRef<Chart | null>(null);
-  const [timeRange, setTimeRange] = useState<'1M' | '3M' | '6M' | '1Y'>('1Y');
+  const [timeRange, setTimeRange] = useState<'3M' | '6M' | '1Y' | 'All'>('1Y');
 
   useEffect(() => {
     if (!chartRef.current || !data || data.length === 0) return;
