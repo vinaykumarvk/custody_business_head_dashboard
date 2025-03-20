@@ -86,13 +86,74 @@ export class PostgresStorage implements IStorage {
   }
 
   async getCustomerGrowth(): Promise<CustomerGrowth[]> {
-    const result = await db.select().from(customerGrowth);
-    return result;
+    // Get customer history data
+    const history = await this.getCustomerHistory();
+    
+    // If no history data, return from customerGrowth table (fallback)
+    if (history.length === 0) {
+      const result = await db.select().from(customerGrowth);
+      return result;
+    }
+    
+    // Sort by date, oldest first
+    const sortedData = history.sort((a, b) => 
+      new Date(a.date).getTime() - new Date(b.date).getTime()
+    );
+    
+    // Map customer history to customer growth format
+    return sortedData.map((item, index) => ({
+      id: index + 1, 
+      date: new Date(item.date),
+      totalCustomers: item.totalCustomers,
+      newCustomers: item.newCustomers
+    }));
   }
 
   async getCustomerSegments(): Promise<CustomerSegments[]> {
-    const result = await db.select().from(customerSegments);
-    return result;
+    // Get customer history data
+    const history = await this.getCustomerHistory();
+    
+    // If no history data, return from customerSegments table (fallback)
+    if (history.length === 0) {
+      const result = await db.select().from(customerSegments);
+      return result;
+    }
+    
+    // Get the most recent customer history record
+    const latestData = history.sort((a, b) => 
+      new Date(b.date).getTime() - new Date(a.date).getTime()
+    )[0];
+    
+    // Calculate total
+    const total = latestData.totalCustomers;
+    
+    if (total === 0) {
+      throw new Error("Total customers cannot be zero");
+    }
+    
+    // Calculate percentages from segments
+    return [
+      {
+        id: 1,
+        segmentName: "Institutional",
+        percentage: ((latestData.institutional / total) * 100).toFixed(1)
+      },
+      {
+        id: 2,
+        segmentName: "Corporate",
+        percentage: ((latestData.corporate / total) * 100).toFixed(1)
+      },
+      {
+        id: 3,
+        segmentName: "High Net Worth",
+        percentage: ((latestData.hni / total) * 100).toFixed(1)
+      },
+      {
+        id: 4,
+        segmentName: "Funds",
+        percentage: ((latestData.funds / total) * 100).toFixed(1)
+      }
+    ];
   }
 
   async getTradingVolume(): Promise<TradingVolume[]> {
