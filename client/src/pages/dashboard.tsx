@@ -81,9 +81,7 @@ export default function Dashboard() {
 
   return (
     <div className="bg-[#F8FAFC] min-h-screen">
-      <div className="container mx-auto px-4 py-8">
-        <h1 className="text-2xl font-bold text-[#2448a5] mb-8">Custody Business Dashboard</h1>
-        
+      <div className="container mx-auto px-4 py-6">
         {customerMetricsError && renderErrorAlert("Failed to load customer metrics")}
         {aucMetricsError && renderErrorAlert("Failed to load AUC metrics")}
         
