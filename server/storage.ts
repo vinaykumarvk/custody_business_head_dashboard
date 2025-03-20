@@ -442,47 +442,52 @@ export class PostgresStorage implements IStorage {
 
   // Helper methods to generate consistent mock data
   private generateMockCustomerGrowth() {
-    // Past 30 months data with more variability
+    // Past 30 months data with data integrity
     const now = new Date();
     const data: { id: number, date: Date, totalCustomers: number, newCustomers: number }[] = [];
     
-    // Base values
-    let previousTotal = 8000; // Start with a lower base to show growth
+    // Base values for first month (Oct 2022)
+    let totalCustomers = 8000; // Starting total
     
+    // Generate data for each month ensuring data integrity
     for (let i = 29; i >= 0; i--) {
       const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
       
-      // Add seasonal patterns and growth trends with more variability
-      const seasonalFactor = Math.sin(i / 3) * 300; // Seasonal fluctuation
-      const growthFactor = (29 - i) * 75; // Steady growth trend
-      const randomFactor = Math.floor(Math.random() * 400) - 200; // Random noise
+      // Calculate new customers with realistic variability
+      let newCustomers = 0;
       
-      // Calculate total customers with variability
-      const totalCustomers = Math.max(
-        previousTotal + 50 + seasonalFactor + randomFactor + (i < 20 ? growthFactor : 0),
-        previousTotal // Ensure it never decreases below previous
-      );
-      
-      // Calculate new customers with more variability
-      const baseNewCustomers = 80 + Math.sin(i / 2) * 80; // Oscillating pattern
-      const seasonalNewCustomers = (i % 4 === 0) ? 350 : 0; // Quarterly spikes
-      const randomNewCustomers = Math.floor(Math.random() * 100); // Random variations
-      
-      // Add market events (e.g., financial crises, booms)
-      const marketEvent = (i === 15) ? 500 : (i === 8) ? -300 : 0; // Specific events
-      
-      // Combine factors for new customers
-      const newCustomers = Math.max(0, Math.floor(baseNewCustomers + seasonalNewCustomers + randomNewCustomers + marketEvent));
+      // Use patterns that make sense for the business
+      if (i === 29) {
+        // First month - define a reasonable starting point for new customers
+        newCustomers = 400;
+      } else {
+        // Generate reasonable new customer numbers
+        const baseNewCustomers = 80 + Math.sin(i / 2) * 60; // Basic oscillating pattern
+        const seasonalNewCustomers = (i % 3 === 0) ? 350 : 0; // Quarterly spikes
+        const randomNewCustomers = Math.floor(Math.random() * 100); // Random variations
+        
+        // Add market events (e.g., financial crises, booms)
+        const marketEvent = (i === 15) ? 500 : (i === 8) ? 300 : 0; // Specific events
+        
+        // Growth trend - more new customers in later periods
+        const growthTrend = Math.floor((29 - i) / 6) * 50;
+        
+        // Combine factors for new customers (always positive)
+        newCustomers = Math.max(30, Math.floor(baseNewCustomers + seasonalNewCustomers + randomNewCustomers + marketEvent + growthTrend));
+      }
       
       data.push({
         id: 30 - i, // Give each item a unique ID starting from 1
         date: date,
-        totalCustomers: Math.round(totalCustomers),
+        totalCustomers: totalCustomers,
         newCustomers: newCustomers
       });
       
-      // Update previous total for next iteration
-      previousTotal = totalCustomers;
+      // Update total customers for next iteration - ENSURING DATA INTEGRITY
+      // Next month's total is this month's total plus new customers
+      if (i > 0) { // For all but the last month
+        totalCustomers = totalCustomers + newCustomers;
+      }
     }
     
     return data;
