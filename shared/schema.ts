@@ -191,12 +191,22 @@ export type MonthlyCustomerData = typeof monthlyCustomerData.$inferSelect;
 export const customerHistory = pgTable("customer_history", {
   id: serial("id").primaryKey(),
   date: timestamp("date").notNull(),
+  // Original fields
   totalCustomers: integer("total_customers").notNull(),
   newCustomers: integer("new_customers").notNull(),
   churnedCustomers: integer("churned_customers").notNull(),
   retentionRate: numeric("retention_rate").notNull(),
   acquisitionCost: numeric("acquisition_cost").notNull(),
   lifetimeValue: numeric("lifetime_value").notNull(),
+  // New segment fields
+  institutional: integer("institutional").notNull().default(0),
+  corporate: integer("corporate").notNull().default(0),
+  hni: integer("hni").notNull().default(0),
+  funds: integer("funds").notNull().default(0),
+  // Additional fields
+  total: integer("total").notNull().default(0),
+  new: integer("new").notNull().default(0),
+  active: integer("active").notNull().default(0),
 });
 
 export const insertCustomerHistorySchema = createInsertSchema(customerHistory).omit({

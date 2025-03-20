@@ -557,22 +557,60 @@ export class PostgresStorage implements IStorage {
         if (existingCustomerHistory.length === 0) {
           console.log("Seeding customer history data...");
           
-          // Generate some sample customer history records
-          const customers = [
-            { customerName: "GlobalTech Pension", onboardingDate: new Date(now.getFullYear() - 3, 5, 15), 
-              segmentType: "Institutional", totalAssets: "12.5", revenueContribution: "2.48" },
-            { customerName: "Eastbrook Investments", onboardingDate: new Date(now.getFullYear() - 2, 8, 3), 
-              segmentType: "Corporate", totalAssets: "10.3", revenueContribution: "1.95" },
-            { customerName: "Atlantic Insurance Ltd", onboardingDate: new Date(now.getFullYear() - 2, 3, 22), 
-              segmentType: "Institutional", totalAssets: "8.7", revenueContribution: "1.62" },
-            { customerName: "Summit Wealth Partners", onboardingDate: new Date(now.getFullYear() - 1, 11, 5), 
-              segmentType: "High Net Worth", totalAssets: "6.8", revenueContribution: "1.24" },
-            { customerName: "Pacific Financial Group", onboardingDate: new Date(now.getFullYear() - 4, 1, 18), 
-              segmentType: "Institutional", totalAssets: "5.9", revenueContribution: "1.05" }
+          // Generate sample customer history records with the new schema
+          const historyData = [
+            {
+              date: new Date(now.getFullYear(), now.getMonth() - 6, 1),
+              totalCustomers: 11800,
+              newCustomers: 120,
+              churnedCustomers: 50,
+              retentionRate: "95.5",
+              acquisitionCost: "250.00",
+              lifetimeValue: "2500.00",
+              institutional: 5300,
+              corporate: 3200,
+              hni: 2100,
+              funds: 1200,
+              total: 11800,
+              new: 120,
+              active: 10200
+            },
+            {
+              date: new Date(now.getFullYear(), now.getMonth() - 3, 1),
+              totalCustomers: 12000,
+              newCustomers: 150,
+              churnedCustomers: 45,
+              retentionRate: "96.2",
+              acquisitionCost: "245.00",
+              lifetimeValue: "2550.00",
+              institutional: 5400,
+              corporate: 3300,
+              hni: 2150,
+              funds: 1150,
+              total: 12000,
+              new: 150,
+              active: 10400
+            },
+            {
+              date: new Date(now.getFullYear(), now.getMonth(), 1),
+              totalCustomers: 12300,
+              newCustomers: 170,
+              churnedCustomers: 40,
+              retentionRate: "96.8",
+              acquisitionCost: "240.00",
+              lifetimeValue: "2600.00",
+              institutional: 5550,
+              corporate: 3400,
+              hni: 2200,
+              funds: 1150,
+              total: 12300,
+              new: 170,
+              active: 10700
+            }
           ];
           
-          for (const customer of customers) {
-            await db.insert(customerHistory).values(customer);
+          for (const record of historyData) {
+            await db.insert(customerHistory).values(record);
           }
         }
         
@@ -652,53 +690,63 @@ export class MemStorage implements IStorage {
       date: new Date()
     };
     // Initialize customer history with sample data
-    const now = new Date();
+    const currentDate = new Date();
     this.custHistory = [
-      { 
+      {
         id: 1,
-        customerName: "GlobalTech Pension", 
-        onboardingDate: new Date(now.getFullYear() - 3, 5, 15), 
-        segmentType: "Institutional", 
-        totalAssets: "12.5", 
-        revenueContribution: "2.48" 
+        date: new Date(currentDate.getFullYear(), currentDate.getMonth() - 6, 1),
+        totalCustomers: 11800,
+        newCustomers: 120,
+        churnedCustomers: 50,
+        retentionRate: "95.5",
+        acquisitionCost: "250.00",
+        lifetimeValue: "2500.00",
+        institutional: 5300,
+        corporate: 3200,
+        hni: 2100,
+        funds: 1200,
+        total: 11800,
+        new: 120,
+        active: 10200
       },
-      { 
+      {
         id: 2,
-        customerName: "Eastbrook Investments", 
-        onboardingDate: new Date(now.getFullYear() - 2, 8, 3), 
-        segmentType: "Corporate", 
-        totalAssets: "10.3", 
-        revenueContribution: "1.95" 
+        date: new Date(currentDate.getFullYear(), currentDate.getMonth() - 3, 1),
+        totalCustomers: 12000,
+        newCustomers: 150,
+        churnedCustomers: 45,
+        retentionRate: "96.2",
+        acquisitionCost: "245.00",
+        lifetimeValue: "2550.00",
+        institutional: 5400,
+        corporate: 3300,
+        hni: 2150,
+        funds: 1150,
+        total: 12000,
+        new: 150,
+        active: 10400
       },
-      { 
+      {
         id: 3,
-        customerName: "Atlantic Insurance Ltd", 
-        onboardingDate: new Date(now.getFullYear() - 2, 3, 22), 
-        segmentType: "Institutional", 
-        totalAssets: "8.7", 
-        revenueContribution: "1.62" 
-      },
-      { 
-        id: 4,
-        customerName: "Summit Wealth Partners", 
-        onboardingDate: new Date(now.getFullYear() - 1, 11, 5), 
-        segmentType: "High Net Worth", 
-        totalAssets: "6.8", 
-        revenueContribution: "1.24" 
-      },
-      { 
-        id: 5,
-        customerName: "Pacific Financial Group", 
-        onboardingDate: new Date(now.getFullYear() - 4, 1, 18), 
-        segmentType: "Institutional", 
-        totalAssets: "5.9", 
-        revenueContribution: "1.05" 
+        date: new Date(currentDate.getFullYear(), currentDate.getMonth(), 1),
+        totalCustomers: 12300,
+        newCustomers: 170,
+        churnedCustomers: 40,
+        retentionRate: "96.8",
+        acquisitionCost: "240.00",
+        lifetimeValue: "2600.00",
+        institutional: 5550,
+        corporate: 3400,
+        hni: 2200,
+        funds: 1150,
+        total: 12300,
+        new: 170,
+        active: 10700
       }
     ];
     
     // Initialize monthly data with 12 months of data
     this.monthlyData = [];
-    const now = new Date();
     for (let i = 11; i >= 0; i--) {
       const month = new Date(now.getFullYear(), now.getMonth() - i, 1);
       
