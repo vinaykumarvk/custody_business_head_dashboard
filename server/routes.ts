@@ -267,22 +267,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // First, clear all existing customer growth data
       await db.delete(customerGrowth);
       
-      console.log("Starting to regenerate customer growth data with proper integrity");
+      console.log("Starting to regenerate customer growth data with guaranteed integrity");
       
       // Generate new data with proper data integrity
       const now = new Date();
-      let totalCustomers = 8000; // Starting total for first month
+      let baseTotal = 8000; // Starting total for first month
+      const months = [];
       
-      // Generate 30 months of data - inserting one by one to guarantee order
-      for (let i = 29; i >= 0; i--) {
-        const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      // First, prepare the data with accurate calculations
+      for (let i = 0; i < 30; i++) {
+        const date = new Date(2022, 9 + i, 1); // Start from October 2022 (fixed date)
         
         // Calculate new customers with realistic variability
-        let newCustomers = 0;
+        let newCustomers;
         
-        // Use patterns that make sense for the business
-        if (i === 29) {
-          // First month - define a reasonable starting point for new customers
+        if (i === 0) {
+          // First month (Oct 2022) - define a reasonable starting point for new customers
           newCustomers = 400;
         } else {
           // Generate reasonable new customer numbers
@@ -294,28 +294,61 @@ export async function registerRoutes(app: Express): Promise<Server> {
           const marketEvent = (i === 15) ? 500 : (i === 8) ? 300 : 0; // Specific events
           
           // Growth trend - more new customers in later periods
-          const growthTrend = Math.floor((29 - i) / 6) * 50;
+          const growthTrend = Math.floor(i / 6) * 50;
           
           // Combine factors for new customers (always positive)
           newCustomers = Math.max(30, Math.floor(baseNewCustomers + seasonalNewCustomers + randomNewCustomers + marketEvent + growthTrend));
         }
         
-        // Insert each record immediately to ensure order integrity
-        await db.insert(customerGrowth).values({
-          date: date,
-          totalCustomers: totalCustomers,
-          newCustomers: newCustomers
+        months.push({
+          date,
+          newCustomers,
+          totalCustomers: i === 0 ? baseTotal : months[i-1].totalCustomers + months[i-1].newCustomers
         });
-        
-        console.log(`Month ${i}: Date=${date.toISOString().substring(0,10)}, Total=${totalCustomers}, New=${newCustomers}`);
-        
-        // Update total customers for next month - ENSURING DATA INTEGRITY
-        totalCustomers = totalCustomers + newCustomers;
       }
       
-      console.log("Finished regenerating customer growth data");
+      // Clear all existing data first
+      console.log("✓ Cleared existing data");
       
-      res.json({ message: "Customer growth data regenerated successfully with data integrity" });
+      // Insert records sequentially with precise values
+      for (const month of months) {
+        await db.insert(customerGrowth).values({
+          date: month.date,
+          totalCustomers: month.totalCustomers,
+          newCustomers: month.newCustomers
+        });
+        
+        console.log(`✓ Inserted: ${month.date.toISOString().substr(0,10)}, Total=${month.totalCustomers}, New=${month.newCustomers}`);
+      }
+      
+      console.log("✓ Finished regenerating all 30 months of customer growth data with perfect integrity");
+      
+      // Verification query to confirm
+      const result = await db.select().from(customerGrowth).orderBy(customerGrowth.date);
+      
+      // Verify integrity
+      let integrityIssues = 0;
+      for (let i = 1; i < result.length; i++) {
+        const prev = result[i-1];
+        const curr = result[i];
+        const expectedTotal = prev.totalCustomers + prev.newCustomers;
+        
+        if (curr.totalCustomers !== expectedTotal) {
+          console.error(`❌ Integrity issue at ${new Date(curr.date).toISOString().substr(0,10)}: ${curr.totalCustomers} ≠ ${prev.totalCustomers} + ${prev.newCustomers}`);
+          integrityIssues++;
+        }
+      }
+      
+      if (integrityIssues === 0) {
+        console.log("✓ Verified data integrity: Perfect! All months have correct totals based on previous month");
+      } else {
+        console.log(`❌ Found ${integrityIssues} integrity issues in the verification check`);
+      }
+      
+      res.json({ 
+        message: "Customer growth data regenerated successfully with perfect data integrity",
+        verificationResult: integrityIssues === 0 ? "perfect" : `${integrityIssues} issues found`
+      });
     } catch (error) {
       console.error("Error regenerating customer growth data:", error);
       res.status(500).json({ message: "Failed to regenerate customer growth data" });
