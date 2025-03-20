@@ -157,6 +157,49 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Failed to fetch top customers" });
     }
   });
+  
+  // Monthly Customer Data endpoint
+  app.get("/api/monthly-customer-data", async (_req, res) => {
+    try {
+      const monthlyData = await storage.getMonthlyCustomerData();
+      
+      // Format dates for JSON
+      const formattedData = monthlyData.map(item => ({
+        ...item,
+        month: item.month instanceof Date ? item.month.toISOString() : item.month
+      }));
+      
+      res.json(formattedData);
+    } catch (error) {
+      console.error("Error fetching monthly customer data:", error);
+      res.status(500).json({ message: "Failed to fetch monthly customer data" });
+    }
+  });
+  
+  // Add new monthly customer data
+  app.post("/api/monthly-customer-data", async (req, res) => {
+    try {
+      const { month, institutional, corporate, hni, funds, activeCustomers } = req.body;
+      
+      if (!month || !institutional || !corporate || !hni || !funds || !activeCustomers) {
+        return res.status(400).json({ message: "Missing required fields" });
+      }
+      
+      const newData = await storage.createMonthlyCustomerData({
+        month: new Date(month),
+        institutional,
+        corporate,
+        hni,
+        funds,
+        activeCustomers
+      });
+      
+      res.status(201).json(newData);
+    } catch (error) {
+      console.error("Error creating monthly customer data:", error);
+      res.status(500).json({ message: "Failed to create monthly customer data" });
+    }
+  });
 
   const httpServer = createServer(app);
 

@@ -253,7 +253,7 @@ export class PostgresStorage implements IStorage {
   private generateMockCustomerGrowth() {
     // Past 12 months data
     const now = new Date();
-    const data = [];
+    const data: { id: number, date: Date, totalCustomers: number, newCustomers: number }[] = [];
     
     for (let i = 11; i >= 0; i--) {
       const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
@@ -261,6 +261,7 @@ export class PostgresStorage implements IStorage {
       const newCustomers = 100 + Math.floor((i % 3 + 1) * 50);
       
       data.push({
+        id: 12 - i, // Give each item a unique ID starting from 1
         date: date,
         totalCustomers: baseTotal,
         newCustomers: newCustomers
@@ -504,6 +505,76 @@ export class PostgresStorage implements IStorage {
         }
       }
       
+      // Monthly Customer Data
+      const existingMonthlyData = await db.select().from(monthlyCustomerData);
+      if (existingMonthlyData.length === 0) {
+        console.log("Seeding monthly customer data...");
+        
+        // Create 12 months of data with consistent growth patterns
+        const now = new Date();
+        for (let i = 11; i >= 0; i--) {
+          const month = new Date(now.getFullYear(), now.getMonth() - i, 1);
+          
+          // Base values with small growth each month
+          const baseInstitutional = 5500 + (i * 60);
+          const baseCorporate = 3100 + (i * 35);
+          const baseHNI = 2500 + (i * 25);
+          const baseFunds = 1200 + (i * 10);
+          
+          // Ensure active customers is less than total
+          const total = baseInstitutional + baseCorporate + baseHNI + baseFunds;
+          const active = Math.floor(total * 0.82); // 82% active rate
+          
+          await db.insert(monthlyCustomerData).values({
+            month,
+            institutional: baseInstitutional,
+            corporate: baseCorporate,
+            hni: baseHNI,
+            funds: baseFunds,
+            activeCustomers: active
+          });
+        }
+        
+        // After populating the monthly data, update dependent tables
+        // using the calculation methods
+        const allMonthlyData = await db.select().from(monthlyCustomerData);
+        
+        // Update customer segments based on the latest month
+        const latestMonth = allMonthlyData.sort((a, b) => 
+          new Date(b.month).getTime() - new Date(a.month).getTime()
+        )[0];
+        
+        const segments = await this.calculateCustomerSegments(latestMonth);
+        await db.delete(customerSegments);
+        for (const segment of segments) {
+          await db.insert(customerSegments).values({
+            segmentName: segment.segmentName,
+            percentage: segment.percentage
+          });
+        }
+        
+        // Update customer growth data
+        const growthData = await this.calculateCustomerGrowth(allMonthlyData);
+        await db.delete(customerGrowth);
+        for (const growth of growthData) {
+          await db.insert(customerGrowth).values({
+            date: growth.date,
+            totalCustomers: growth.totalCustomers,
+            newCustomers: growth.newCustomers
+          });
+        }
+        
+        // Update the customer metrics with derived values
+        const metrics = await this.calculateDerivedCustomerMetrics(allMonthlyData);
+        await db.delete(customerMetrics);
+        await db.insert(customerMetrics).values({
+          totalCustomers: metrics.totalCustomers,
+          activeCustomers: metrics.activeCustomers,
+          newCustomersMTD: metrics.newCustomersMTD,
+          date: metrics.date
+        });
+      }
+      
       console.log("Database seeding completed");
     } catch (error) {
       console.error("Error seeding database:", error);
@@ -525,6 +596,7 @@ export class MemStorage implements IStorage {
   private incByService: IncomeByService[];
   private incHistory: IncomeHistory[];
   private topCust: TopCustomers[];
+  private monthlyData: MonthlyCustomerData[];
   currentId: number;
 
   constructor() {
@@ -537,12 +609,40 @@ export class MemStorage implements IStorage {
       newCustomersMTD: 175,
       date: new Date()
     };
+    
+    // Initialize monthly data with 12 months of data
+    this.monthlyData = [];
+    const now = new Date();
+    for (let i = 11; i >= 0; i--) {
+      const month = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      
+      // Base values with small growth each month
+      const baseInstitutional = 5500 + (i * 60);
+      const baseCorporate = 3100 + (i * 35);
+      const baseHNI = 2500 + (i * 25);
+      const baseFunds = 1200 + (i * 10);
+      
+      // Ensure active customers is less than total
+      const total = baseInstitutional + baseCorporate + baseHNI + baseFunds;
+      const active = Math.floor(total * 0.82); // 82% active rate
+      
+      this.monthlyData.push({
+        id: 12 - i,
+        month,
+        institutional: baseInstitutional,
+        corporate: baseCorporate,
+        hni: baseHNI,
+        funds: baseFunds,
+        activeCustomers: active
+      });
+    }
+    
     this.customGrowth = [];
     this.customSegments = [
       { id: 1, segmentName: "Institutional", percentage: "45" },
-      { id: 2, segmentName: "Pension Funds", percentage: "25" },
+      { id: 2, segmentName: "Corporate", percentage: "25" },
       { id: 3, segmentName: "High Net Worth", percentage: "20" },
-      { id: 4, segmentName: "Retail", percentage: "10" }
+      { id: 4, segmentName: "Funds", percentage: "10" }
     ];
     this.tradingVol = [];
     this.aucHist = [];
@@ -667,6 +767,137 @@ export class MemStorage implements IStorage {
     return this.topCust;
   }
 
+  async getMonthlyCustomerData(): Promise<MonthlyCustomerData[]> {
+    return this.monthlyData;
+  }
+  
+  async createMonthlyCustomerData(data: InsertMonthlyCustomerData): Promise<MonthlyCustomerData> {
+    const id = this.monthlyData.length > 0 
+      ? Math.max(...this.monthlyData.map(item => item.id)) + 1 
+      : 1;
+      
+    const newData: MonthlyCustomerData = {
+      ...data,
+      id
+    };
+    
+    this.monthlyData.push(newData);
+    return newData;
+  }
+  
+  async calculateDerivedCustomerMetrics(dataPoints: MonthlyCustomerData[]): Promise<CustomerMetrics> {
+    if (dataPoints.length === 0) {
+      throw new Error("No monthly customer data available");
+    }
+    
+    // Get the latest month data
+    const latestData = dataPoints.sort((a, b) => 
+      new Date(b.month).getTime() - new Date(a.month).getTime()
+    )[0];
+    
+    // Calculate total customers as sum of all segments
+    const totalCustomers = latestData.institutional + latestData.corporate + 
+      latestData.hni + latestData.funds;
+    
+    // Calculate new customers by comparing with previous month
+    let newCustomersMTD = 0;
+    if (dataPoints.length > 1) {
+      const previousData = dataPoints.sort((a, b) => 
+        new Date(b.month).getTime() - new Date(a.month).getTime()
+      )[1];
+      
+      const previousTotal = previousData.institutional + previousData.corporate + 
+        previousData.hni + previousData.funds;
+        
+      newCustomersMTD = Math.max(0, totalCustomers - previousTotal);
+    }
+    
+    // Active customers is already part of the monthly data
+    const activeCustomers = latestData.activeCustomers;
+    
+    return {
+      id: 1, // This will be overwritten for database persistence
+      totalCustomers,
+      activeCustomers,
+      newCustomersMTD,
+      date: new Date()
+    };
+  }
+  
+  async calculateCustomerGrowth(dataPoints: MonthlyCustomerData[]): Promise<CustomerGrowth[]> {
+    if (dataPoints.length === 0) {
+      return [];
+    }
+    
+    // Sort by date, oldest first
+    const sortedData = dataPoints.sort((a, b) => 
+      new Date(a.month).getTime() - new Date(b.month).getTime()
+    );
+    
+    const result: CustomerGrowth[] = [];
+    
+    for (let i = 0; i < sortedData.length; i++) {
+      const current = sortedData[i];
+      const totalCustomers = current.institutional + current.corporate + 
+        current.hni + current.funds;
+        
+      let newCustomers = 0;
+      if (i > 0) {
+        const previous = sortedData[i-1];
+        const previousTotal = previous.institutional + previous.corporate + 
+          previous.hni + previous.funds;
+          
+        newCustomers = Math.max(0, totalCustomers - previousTotal);
+      } else {
+        // For the first month, use 5% of total as new customers
+        newCustomers = Math.round(totalCustomers * 0.05);
+      }
+      
+      result.push({
+        id: i + 1,
+        date: new Date(current.month),
+        totalCustomers,
+        newCustomers
+      });
+    }
+    
+    return result;
+  }
+  
+  async calculateCustomerSegments(dataPoint: MonthlyCustomerData): Promise<CustomerSegments[]> {
+    // Calculate total
+    const total = dataPoint.institutional + dataPoint.corporate + 
+      dataPoint.hni + dataPoint.funds;
+      
+    if (total === 0) {
+      throw new Error("Total customers cannot be zero");
+    }
+    
+    // Calculate percentages
+    return [
+      {
+        id: 1,
+        segmentName: "Institutional",
+        percentage: ((dataPoint.institutional / total) * 100).toFixed(1)
+      },
+      {
+        id: 2,
+        segmentName: "Corporate",
+        percentage: ((dataPoint.corporate / total) * 100).toFixed(1)
+      },
+      {
+        id: 3,
+        segmentName: "High Net Worth",
+        percentage: ((dataPoint.hni / total) * 100).toFixed(1)
+      },
+      {
+        id: 4,
+        segmentName: "Funds",
+        percentage: ((dataPoint.funds / total) * 100).toFixed(1)
+      }
+    ];
+  }
+  
   async seedDatabase(): Promise<void> {
     console.log("Using memory storage, no seeding needed");
   }
