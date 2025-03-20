@@ -101,6 +101,7 @@ export const aucMetrics = pgTable("auc_metrics", {
   fixedIncome: numeric("fixed_income").notNull(),
   mutualFunds: numeric("mutual_funds").notNull(),
   others: numeric("others").notNull(),
+  growth: numeric("growth"),  // Growth percentage
 });
 
 export const insertAucMetricsSchema = createInsertSchema(aucMetrics).omit({

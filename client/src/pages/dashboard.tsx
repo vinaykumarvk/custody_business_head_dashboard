@@ -121,7 +121,7 @@ export default function Dashboard() {
                 title="AUC (Assets Under Custody)" 
                 value={`$${aucMetrics?.totalAuc}B`}
                 icon={<FiBarChart2 size={24} color="#2448a5" />}
-                change={5.2}
+                change={parseFloat(aucMetrics?.growth)}
               />
             </>
           )}
