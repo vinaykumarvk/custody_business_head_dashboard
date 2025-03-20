@@ -270,8 +270,9 @@ export class PostgresStorage implements IStorage {
     const incomeMTD = latestAmount;
     const outstandingFees = incomeMTD * 0.3;
     
-    // Calculate growth rate
+    // Calculate growth rate and round to 2 decimal places
     const growthRate = ((latestAmount - previousAmount) / previousAmount) * 100;
+    const formattedGrowthRate = growthRate.toFixed(2);
     
     // Update or insert the income data
     const existingIncome = await db.select().from(income);
@@ -280,9 +281,9 @@ export class PostgresStorage implements IStorage {
       // Update existing record
       await db.update(income)
         .set({
-          incomeMTD: incomeMTD,
-          outstandingFees: outstandingFees,
-          growth: growthRate
+          incomeMTD: incomeMTD.toFixed(2),
+          outstandingFees: outstandingFees.toFixed(2),
+          growth: formattedGrowthRate
         })
         .where(eq(income.id, existingIncome[0].id));
       
@@ -293,9 +294,9 @@ export class PostgresStorage implements IStorage {
       // Insert new record
       const [insertedIncome] = await db.insert(income)
         .values({
-          incomeMTD: incomeMTD,
-          outstandingFees: outstandingFees,
-          growth: growthRate
+          incomeMTD: incomeMTD.toFixed(2),
+          outstandingFees: outstandingFees.toFixed(2),
+          growth: formattedGrowthRate
         })
         .returning();
       return insertedIncome;
