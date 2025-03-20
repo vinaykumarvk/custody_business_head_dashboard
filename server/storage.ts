@@ -456,34 +456,81 @@ export class PostgresStorage implements IStorage {
 
   // Helper methods to generate consistent mock data
   private generateMockCustomerGrowth() {
-    // Past 12 months data
+    // Past 12 months data with more variability
     const now = new Date();
     const data: { id: number, date: Date, totalCustomers: number, newCustomers: number }[] = [];
     
+    // Base values
+    let previousTotal = 10000;
+    
     for (let i = 11; i >= 0; i--) {
       const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
-      const baseTotal = 11000 + (11 - i) * 130;
-      const newCustomers = 100 + Math.floor((i % 3 + 1) * 50);
+      
+      // Add seasonal patterns and growth trends with more variability
+      const seasonalFactor = Math.sin(i / 3) * 300; // Seasonal fluctuation
+      const growthFactor = (11 - i) * 150; // Steady growth trend
+      const randomFactor = Math.floor(Math.random() * 400) - 200; // Random noise
+      
+      // Calculate total customers with variability
+      const totalCustomers = Math.max(
+        previousTotal + 100 + seasonalFactor + randomFactor,
+        previousTotal // Ensure it never decreases below previous
+      );
+      
+      // Calculate new customers with more variability
+      const baseNewCustomers = 80 + Math.sin(i / 2) * 80; // Oscillating pattern
+      const seasonalNewCustomers = (i % 4 === 0) ? 350 : 0; // Quarterly spikes
+      const randomNewCustomers = Math.floor(Math.random() * 100); // Random variations
+      
+      // Combine factors for new customers
+      const newCustomers = Math.max(0, Math.floor(baseNewCustomers + seasonalNewCustomers + randomNewCustomers));
       
       data.push({
         id: 12 - i, // Give each item a unique ID starting from 1
         date: date,
-        totalCustomers: baseTotal,
+        totalCustomers: Math.round(totalCustomers),
         newCustomers: newCustomers
       });
+      
+      // Update previous total for next iteration
+      previousTotal = totalCustomers;
     }
     
     return data;
   }
 
   private generateMockTradingVolume() {
-    // Past 12 months data with consistent growth pattern
+    // Past 12 months data with more variability and market trends
     const now = new Date();
     const data = [];
     
+    // Base trading volume
+    let baseVolume = 22;
+    
     for (let i = 11; i >= 0; i--) {
       const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
-      const volume = 22 + (i * 0.5) + (Math.sin(i) * 2);
+      
+      // Add multiple factors to create more realistic variability
+      
+      // Trend component - general market growth
+      const trendFactor = i * 0.3;
+      
+      // Seasonal component - higher volumes in certain months (e.g., Q4, end of fiscal year)
+      const seasonalFactor = Math.sin(i * Math.PI/6) * 3.5;
+      
+      // Market volatility component - random fluctuations
+      const volatilityBase = Math.random() * 4 - 2; // Random between -2 and 2
+      
+      // Occasional market events - significant spikes or drops
+      const marketEvent = (i % 4 === 0) ? (Math.random() * 8 - 4) : 0; // Every 4 months
+      
+      // Calculate final volume with all factors
+      const volume = baseVolume + trendFactor + seasonalFactor + volatilityBase + marketEvent;
+      
+      // Update base volume for next iteration to create dependencies between months
+      // Volume growth has momentum (market trends tend to continue)
+      const momentumFactor = (volume > baseVolume) ? 0.3 : -0.1; // Growth has more momentum than decline
+      baseVolume = volume + momentumFactor;
       
       data.push({
         date: date,
@@ -495,23 +542,73 @@ export class PostgresStorage implements IStorage {
   }
 
   private generateMockAucHistory() {
-    // Past 12 months data with consistent growth patterns
+    // Past 12 months data with more variability in each asset class
     const now = new Date();
     const data = [];
     
+    // Starting values for each asset class
+    let equity = 42;
+    let fixedIncome = 35;
+    let mutualFunds = 18;
+    let others = 9;
+    
     for (let i = 11; i >= 0; i--) {
       const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
-      const baseEquity = 42 + (i * 0.4);
-      const baseFixedIncome = 35 + (i * 0.25);
-      const baseMutual = 18 + (i * 0.15);
-      const baseOthers = 9 + (i * 0.05);
+      
+      // Market conditions affect each asset class differently
+      
+      // Equity - more volatile, affected by market sentiment
+      const equityMarketTrend = i * 0.4; // Overall growth trend
+      const equitySeasonal = Math.sin(i * Math.PI/3) * 2.2; // Cyclical pattern
+      const equityVolatility = (Math.random() * 3) - 1.5; // High volatility
+      // Market events affect equities more dramatically
+      const equityEvent = (i === 3 || i === 7) ? -2.8 : (i === 5 || i === 9) ? 2.5 : 0;
+      
+      // Fixed Income - more stable, less affected by market sentiment
+      const fiMarketTrend = i * 0.25; // Slower growth
+      const fiSeasonal = Math.sin(i * Math.PI/6) * 0.8; // Smaller cycles
+      const fiVolatility = (Math.random() * 1.2) - 0.6; // Lower volatility
+      // Interest rate changes affect fixed income
+      const fiEvent = (i === 4 || i === 8) ? -1.2 : (i === 2) ? 0.8 : 0;
+      
+      // Mutual Funds - moderate volatility
+      const mfMarketTrend = i * 0.2;
+      const mfSeasonal = Math.cos(i * Math.PI/4) * 1.3;
+      const mfVolatility = (Math.random() * 1.8) - 0.9;
+      
+      // Others - diverse asset types
+      const othersMarketTrend = i * 0.1;
+      const othersSeasonal = Math.sin(i * Math.PI/2) * 0.6;
+      const othersVolatility = (Math.random() * 1.4) - 0.7;
+      // Alternative investments sometimes see sudden interest
+      const othersEvent = (i === 6) ? 2.0 : 0;
+      
+      // Calculate new values with momentum factors (markets tend to continue trends)
+      equity = equity + equityMarketTrend + equitySeasonal + equityVolatility + equityEvent;
+      // Momentum factor - continue trends
+      equity = equity + (equity > 42 ? 0.3 : -0.2);
+      
+      fixedIncome = fixedIncome + fiMarketTrend + fiSeasonal + fiVolatility + fiEvent;
+      fixedIncome = fixedIncome + (fixedIncome > 35 ? 0.2 : -0.1);
+      
+      mutualFunds = mutualFunds + mfMarketTrend + mfSeasonal + mfVolatility;
+      mutualFunds = mutualFunds + (mutualFunds > 18 ? 0.15 : -0.1);
+      
+      others = others + othersMarketTrend + othersSeasonal + othersVolatility + othersEvent;
+      others = others + (others > 9 ? 0.1 : -0.05);
+      
+      // Ensure all values stay positive
+      equity = Math.max(equity, 35);
+      fixedIncome = Math.max(fixedIncome, 30);
+      mutualFunds = Math.max(mutualFunds, 15);
+      others = Math.max(others, 7);
       
       data.push({
         date: date,
-        equity: parseFloat(baseEquity.toFixed(1)),
-        fixedIncome: parseFloat(baseFixedIncome.toFixed(1)),
-        mutualFunds: parseFloat(baseMutual.toFixed(1)),
-        others: parseFloat(baseOthers.toFixed(1))
+        equity: parseFloat(equity.toFixed(1)),
+        fixedIncome: parseFloat(fixedIncome.toFixed(1)),
+        mutualFunds: parseFloat(mutualFunds.toFixed(1)),
+        others: parseFloat(others.toFixed(1))
       });
     }
     
@@ -519,13 +616,45 @@ export class PostgresStorage implements IStorage {
   }
 
   private generateMockIncomeHistory() {
-    // Past 12 months data
+    // Past 12 months data with more variability
     const now = new Date();
     const data = [];
     
+    // Base income value
+    let baseIncome = 2.2;
+    
     for (let i = 11; i >= 0; i--) {
       const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
-      const amount = 2.2 + (i * 0.05) + (Math.sin(i / 2) * 0.3);
+      
+      // Income is affected by several factors
+      
+      // General growth trend
+      const growthTrend = i * 0.08;
+      
+      // Seasonal patterns - higher income in certain periods
+      const seasonalPattern = Math.sin(i * Math.PI/3) * 0.4;
+      
+      // Business cycle effects - longer term oscillations
+      const businessCycle = Math.sin(i * Math.PI/6) * 0.2;
+      
+      // Random fluctuations - monthly variations in business
+      const randomFluctuation = (Math.random() * 0.4) - 0.2;
+      
+      // Market events - occasional significant impacts
+      const marketEvent = (i === 3) ? -0.5 : (i === 7) ? 0.6 : 0;
+      
+      // Combined effect
+      const incomeVariation = growthTrend + seasonalPattern + businessCycle + randomFluctuation + marketEvent;
+      
+      // Apply variations to base income
+      const amount = baseIncome + incomeVariation;
+      
+      // Update base income with some momentum effect (income tends to build on itself)
+      const momentum = (amount > baseIncome) ? 0.05 : -0.02;
+      baseIncome = amount + momentum;
+      
+      // Ensure income stays reasonable and positive
+      baseIncome = Math.max(baseIncome, 1.8);
       
       data.push({
         date: date,
@@ -717,27 +846,69 @@ export class PostgresStorage implements IStorage {
       if (existingMonthlyData.length === 0) {
         console.log("Seeding monthly customer data...");
         
-        // Create 12 months of data with consistent growth patterns
+        // Create 12 months of data with more variability in customer segments
         const now = new Date();
+        
+        // Initial distribution of customers across segments
+        let institutional = 5200;
+        let corporate = 2800; 
+        let hni = 2300;
+        let funds = 1100;
+        
         for (let i = 11; i >= 0; i--) {
           const month = new Date(now.getFullYear(), now.getMonth() - i, 1);
           
-          // Base values with small growth each month
-          const baseInstitutional = 5500 + (i * 60);
-          const baseCorporate = 3100 + (i * 35);
-          const baseHNI = 2500 + (i * 25);
-          const baseFunds = 1200 + (i * 10);
+          // Add seasonal and trend factors with more variability
           
-          // Ensure active customers is less than total
-          const total = baseInstitutional + baseCorporate + baseHNI + baseFunds;
-          const active = Math.floor(total * 0.82); // 82% active rate
+          // Institutional clients - higher growth in Q4 and Q1 (financial year cycles)
+          const institutionalSeasonality = (i % 12 < 3 || i % 12 >= 9) ? 120 : -40;
+          const institutionalRandom = Math.floor(Math.random() * 160) - 80;
+          const institutionalGrowth = 50 + institutionalSeasonality + institutionalRandom;
+          
+          // Corporate clients - moderate growth with quarterly patterns
+          const corporateSeasonality = Math.sin(i * Math.PI/6) * 70;
+          const corporateRandom = Math.floor(Math.random() * 120) - 60;
+          const corporateGrowth = 35 + corporateSeasonality + corporateRandom;
+          
+          // HNI clients - affected by market conditions (add variability)
+          const hniSeasonality = Math.cos(i * Math.PI/3) * 60;
+          const hniRandom = Math.floor(Math.random() * 100) - 50;
+          const hniGrowth = 30 + hniSeasonality + hniRandom;
+          
+          // Fund clients - relatively stable with occasional spikes
+          const fundsSeasonality = (i % 6 === 0) ? 80 : 10;
+          const fundsRandom = Math.floor(Math.random() * 50) - 25;
+          const fundsGrowth = 20 + fundsSeasonality + fundsRandom;
+          
+          // Update the running totals
+          institutional = Math.max(institutional + institutionalGrowth, institutional * 0.98); // Never decrease by more than 2%
+          corporate = Math.max(corporate + corporateGrowth, corporate * 0.97); // Allow slightly more decrease
+          hni = Math.max(hni + hniGrowth, hni * 0.95); // HNI can be more volatile
+          funds = Math.max(funds + fundsGrowth, funds * 0.98); // Funds relatively stable
+          
+          // Round to integers
+          const institutionalValue = Math.round(institutional);
+          const corporateValue = Math.round(corporate);
+          const hniValue = Math.round(hni);
+          const fundsValue = Math.round(funds);
+          
+          // Ensure active customers is less than total, with variable activity rate
+          const total = institutionalValue + corporateValue + hniValue + fundsValue;
+          
+          // Activity rate varies by month (higher in busy periods)
+          const activityBase = 0.80; // Base activity rate
+          const activitySeasonal = (i % 3 === 0) ? 0.05 : 0; // Higher at quarter end
+          const activityRandom = (Math.random() * 0.04) - 0.02; // +/- 2% random variation
+          const activityRate = Math.min(Math.max(activityBase + activitySeasonal + activityRandom, 0.75), 0.92);
+          
+          const active = Math.floor(total * activityRate);
           
           await db.insert(monthlyCustomerData).values({
             month,
-            institutional: baseInstitutional,
-            corporate: baseCorporate,
-            hni: baseHNI,
-            funds: baseFunds,
+            institutional: institutionalValue,
+            corporate: corporateValue,
+            hni: hniValue,
+            funds: fundsValue,
             activeCustomers: active
           });
         }
