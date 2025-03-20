@@ -46,7 +46,6 @@ const CustomerGrowthChart: React.FC<CustomerGrowthChartProps> = ({ data }) => {
 
     const labels = filteredData.map(item => format(new Date(item.date), 'MMM yyyy'));
     const totalCustomersData = filteredData.map(item => item.totalCustomers);
-    const newCustomersData = filteredData.map(item => item.newCustomers);
 
     chartInstance.current = new Chart(ctx, {
       type: 'line',
@@ -61,19 +60,7 @@ const CustomerGrowthChart: React.FC<CustomerGrowthChartProps> = ({ data }) => {
             borderWidth: 4,
             tension: 0.4,
             fill: false,
-            pointRadius: 0,
-            yAxisID: 'y'
-          },
-          {
-            label: 'New Customers',
-            data: newCustomersData,
-            borderColor: '#4CAF50',
-            backgroundColor: 'rgba(76, 175, 80, 0.1)',
-            borderWidth: 4,
-            tension: 0.4,
-            fill: false,
-            pointRadius: 0,
-            yAxisID: 'y1'
+            pointRadius: 0
           }
         ]
       },
@@ -97,19 +84,6 @@ const CustomerGrowthChart: React.FC<CustomerGrowthChartProps> = ({ data }) => {
             title: {
               display: true,
               text: 'Total Customers'
-            }
-          },
-          y1: {
-            type: 'linear',
-            display: true,
-            position: 'right',
-            beginAtZero: true,
-            grid: {
-              drawOnChartArea: false
-            },
-            title: {
-              display: true,
-              text: 'New Customers'
             }
           }
         },
