@@ -186,7 +186,7 @@ export class PostgresStorage implements IStorage {
       new Date(a.month).getTime() - new Date(b.month).getTime()
     );
     
-    const result: { date: Date, totalCustomers: number, newCustomers: number }[] = [];
+    const result: { id: number, date: Date, totalCustomers: number, newCustomers: number }[] = [];
     
     for (let i = 0; i < sortedData.length; i++) {
       const current = sortedData[i];
@@ -206,6 +206,7 @@ export class PostgresStorage implements IStorage {
       }
       
       result.push({
+        id: i + 1, // Add sequential ID starting from 1
         date: new Date(current.month),
         totalCustomers,
         newCustomers
