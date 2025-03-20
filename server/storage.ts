@@ -552,6 +552,30 @@ export class PostgresStorage implements IStorage {
           });
         }
         
+        // Customer History Data
+        const existingCustomerHistory = await db.select().from(customerHistory);
+        if (existingCustomerHistory.length === 0) {
+          console.log("Seeding customer history data...");
+          
+          // Generate some sample customer history records
+          const customers = [
+            { customerName: "GlobalTech Pension", onboardingDate: new Date(now.getFullYear() - 3, 5, 15), 
+              segmentType: "Institutional", totalAssets: "12.5", revenueContribution: "2.48" },
+            { customerName: "Eastbrook Investments", onboardingDate: new Date(now.getFullYear() - 2, 8, 3), 
+              segmentType: "Corporate", totalAssets: "10.3", revenueContribution: "1.95" },
+            { customerName: "Atlantic Insurance Ltd", onboardingDate: new Date(now.getFullYear() - 2, 3, 22), 
+              segmentType: "Institutional", totalAssets: "8.7", revenueContribution: "1.62" },
+            { customerName: "Summit Wealth Partners", onboardingDate: new Date(now.getFullYear() - 1, 11, 5), 
+              segmentType: "High Net Worth", totalAssets: "6.8", revenueContribution: "1.24" },
+            { customerName: "Pacific Financial Group", onboardingDate: new Date(now.getFullYear() - 4, 1, 18), 
+              segmentType: "Institutional", totalAssets: "5.9", revenueContribution: "1.05" }
+          ];
+          
+          for (const customer of customers) {
+            await db.insert(customerHistory).values(customer);
+          }
+        }
+        
         // After populating the monthly data, update dependent tables
         // using the calculation methods
         const allMonthlyData = await db.select().from(monthlyCustomerData);
@@ -627,7 +651,50 @@ export class MemStorage implements IStorage {
       newCustomersMTD: 175,
       date: new Date()
     };
-    this.custHistory = [];
+    // Initialize customer history with sample data
+    const now = new Date();
+    this.custHistory = [
+      { 
+        id: 1,
+        customerName: "GlobalTech Pension", 
+        onboardingDate: new Date(now.getFullYear() - 3, 5, 15), 
+        segmentType: "Institutional", 
+        totalAssets: "12.5", 
+        revenueContribution: "2.48" 
+      },
+      { 
+        id: 2,
+        customerName: "Eastbrook Investments", 
+        onboardingDate: new Date(now.getFullYear() - 2, 8, 3), 
+        segmentType: "Corporate", 
+        totalAssets: "10.3", 
+        revenueContribution: "1.95" 
+      },
+      { 
+        id: 3,
+        customerName: "Atlantic Insurance Ltd", 
+        onboardingDate: new Date(now.getFullYear() - 2, 3, 22), 
+        segmentType: "Institutional", 
+        totalAssets: "8.7", 
+        revenueContribution: "1.62" 
+      },
+      { 
+        id: 4,
+        customerName: "Summit Wealth Partners", 
+        onboardingDate: new Date(now.getFullYear() - 1, 11, 5), 
+        segmentType: "High Net Worth", 
+        totalAssets: "6.8", 
+        revenueContribution: "1.24" 
+      },
+      { 
+        id: 5,
+        customerName: "Pacific Financial Group", 
+        onboardingDate: new Date(now.getFullYear() - 4, 1, 18), 
+        segmentType: "Institutional", 
+        totalAssets: "5.9", 
+        revenueContribution: "1.05" 
+      }
+    ];
     
     // Initialize monthly data with 12 months of data
     this.monthlyData = [];
@@ -801,6 +868,24 @@ export class MemStorage implements IStorage {
     };
     
     this.monthlyData.push(newData);
+    return newData;
+  }
+  
+  async getCustomerHistory(): Promise<CustomerHistory[]> {
+    return this.custHistory;
+  }
+  
+  async createCustomerHistory(data: InsertCustomerHistory): Promise<CustomerHistory> {
+    const id = this.custHistory.length > 0 
+      ? Math.max(...this.custHistory.map(item => item.id)) + 1 
+      : 1;
+      
+    const newData: CustomerHistory = {
+      ...data,
+      id
+    };
+    
+    this.custHistory.push(newData);
     return newData;
   }
   
