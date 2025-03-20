@@ -13,7 +13,7 @@ import {
   monthlyCustomerData, type MonthlyCustomerData, type InsertMonthlyCustomerData,
   customerHistory, type CustomerHistory, type InsertCustomerHistory
 } from "@shared/schema";
-import { eq } from 'drizzle-orm';
+import { eq, desc } from 'drizzle-orm';
 import { drizzle } from 'drizzle-orm/postgres-js';
 import postgres from 'postgres';
 
@@ -741,29 +741,110 @@ export class PostgresStorage implements IStorage {
         }
       }
       
-      // AUC Metrics
+      // AUC Metrics - calculate from the latest AUC history data
       const existingAucMetrics = await db.select().from(aucMetrics);
       if (existingAucMetrics.length === 0) {
         console.log("Seeding AUC metrics...");
-        await db.insert(aucMetrics).values({
-          totalAuc: "104.5",
-          equity: "48.2",
-          fixedIncome: "38.1",
-          mutualFunds: "10.2",
-          others: "8.0",
-          growth: "-0.9"
-        });
+        
+        // Get the latest AUC history data to derive the metrics
+        const aucHistoryData = await db.select().from(aucHistory).limit(20);
+        
+        // Sort by date (most recent first) in JavaScript
+        aucHistoryData.sort((a, b) => 
+          new Date(b.date).getTime() - new Date(a.date).getTime()
+        );
+        
+        if (aucHistoryData.length > 0) {
+          const latest = aucHistoryData[0];
+          
+          // Convert string values to numbers for calculations
+          const equityValue = parseFloat(latest.equity);
+          const fixedIncomeValue = parseFloat(latest.fixedIncome);
+          const mutualFundsValue = parseFloat(latest.mutualFunds);
+          const othersValue = parseFloat(latest.others);
+          
+          // Calculate total AUC
+          const totalAucValue = equityValue + fixedIncomeValue + mutualFundsValue + othersValue;
+          
+          // Calculate growth if we have previous data
+          let growthValue = 0;
+          if (aucHistoryData.length > 1) {
+            const previous = aucHistoryData[1];
+            const previousTotal = parseFloat(previous.equity) + 
+                                 parseFloat(previous.fixedIncome) + 
+                                 parseFloat(previous.mutualFunds) + 
+                                 parseFloat(previous.others);
+            
+            growthValue = ((totalAucValue - previousTotal) / previousTotal) * 100;
+          }
+          
+          // Insert the calculated metrics
+          await db.insert(aucMetrics).values({
+            totalAuc: totalAucValue.toFixed(1),
+            equity: equityValue.toFixed(1),
+            fixedIncome: fixedIncomeValue.toFixed(1),
+            mutualFunds: mutualFundsValue.toFixed(1),
+            others: othersValue.toFixed(1),
+            growth: growthValue.toFixed(1)
+          });
+        } else {
+          // Fallback if no history data is available
+          await db.insert(aucMetrics).values({
+            totalAuc: "104.5",
+            equity: "48.2",
+            fixedIncome: "38.1",
+            mutualFunds: "10.2",
+            others: "8.0",
+            growth: "-0.9"
+          });
+        }
       }
       
-      // Income
+      // Income - calculate from income history data
       const existingIncome = await db.select().from(income);
       if (existingIncome.length === 0) {
         console.log("Seeding income...");
-        await db.insert(income).values({
-          incomeMTD: "2.75",
-          outstandingFees: "0.85",
-          growth: "3.2"
-        });
+        
+        // Get the latest income history data to derive the metrics
+        const incomeHistoryData = await db.select().from(incomeHistory).limit(20);
+        
+        // Sort by date (most recent first) in JavaScript
+        incomeHistoryData.sort((a, b) => 
+          new Date(b.date).getTime() - new Date(a.date).getTime()
+        );
+        
+        if (incomeHistoryData.length > 0) {
+          const latest = incomeHistoryData[0];
+          
+          // Convert string value to number for calculation
+          const incomeMTDValue = parseFloat(latest.amount);
+          
+          // Set outstanding fees as roughly 30% of monthly income
+          const outstandingFeesValue = incomeMTDValue * 0.3;
+          
+          // Calculate growth if we have previous data
+          let growthValue = 0;
+          if (incomeHistoryData.length > 1) {
+            const previous = incomeHistoryData[1];
+            const previousAmount = parseFloat(previous.amount);
+            
+            growthValue = ((incomeMTDValue - previousAmount) / previousAmount) * 100;
+          }
+          
+          // Insert the calculated metrics
+          await db.insert(income).values({
+            incomeMTD: incomeMTDValue.toFixed(2),
+            outstandingFees: outstandingFeesValue.toFixed(2),
+            growth: growthValue.toFixed(1)
+          });
+        } else {
+          // Fallback if no history data is available
+          await db.insert(income).values({
+            incomeMTD: "2.75",
+            outstandingFees: "0.85",
+            growth: "3.2"
+          });
+        }
       }
       
       // Income By Service
