@@ -456,24 +456,24 @@ export class PostgresStorage implements IStorage {
 
   // Helper methods to generate consistent mock data
   private generateMockCustomerGrowth() {
-    // Past 12 months data with more variability
+    // Past 30 months data with more variability
     const now = new Date();
     const data: { id: number, date: Date, totalCustomers: number, newCustomers: number }[] = [];
     
     // Base values
-    let previousTotal = 10000;
+    let previousTotal = 8000; // Start with a lower base to show growth
     
-    for (let i = 11; i >= 0; i--) {
+    for (let i = 29; i >= 0; i--) {
       const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
       
       // Add seasonal patterns and growth trends with more variability
       const seasonalFactor = Math.sin(i / 3) * 300; // Seasonal fluctuation
-      const growthFactor = (11 - i) * 150; // Steady growth trend
+      const growthFactor = (29 - i) * 75; // Steady growth trend
       const randomFactor = Math.floor(Math.random() * 400) - 200; // Random noise
       
       // Calculate total customers with variability
       const totalCustomers = Math.max(
-        previousTotal + 100 + seasonalFactor + randomFactor,
+        previousTotal + 50 + seasonalFactor + randomFactor + (i < 20 ? growthFactor : 0),
         previousTotal // Ensure it never decreases below previous
       );
       
@@ -482,11 +482,14 @@ export class PostgresStorage implements IStorage {
       const seasonalNewCustomers = (i % 4 === 0) ? 350 : 0; // Quarterly spikes
       const randomNewCustomers = Math.floor(Math.random() * 100); // Random variations
       
+      // Add market events (e.g., financial crises, booms)
+      const marketEvent = (i === 15) ? 500 : (i === 8) ? -300 : 0; // Specific events
+      
       // Combine factors for new customers
-      const newCustomers = Math.max(0, Math.floor(baseNewCustomers + seasonalNewCustomers + randomNewCustomers));
+      const newCustomers = Math.max(0, Math.floor(baseNewCustomers + seasonalNewCustomers + randomNewCustomers + marketEvent));
       
       data.push({
-        id: 12 - i, // Give each item a unique ID starting from 1
+        id: 30 - i, // Give each item a unique ID starting from 1
         date: date,
         totalCustomers: Math.round(totalCustomers),
         newCustomers: newCustomers
@@ -500,20 +503,20 @@ export class PostgresStorage implements IStorage {
   }
 
   private generateMockTradingVolume() {
-    // Past 12 months data with more variability and market trends
+    // Past 30 months data with more variability and market trends
     const now = new Date();
     const data = [];
     
     // Base trading volume
-    let baseVolume = 22;
+    let baseVolume = 15; // Start lower to show growth trend
     
-    for (let i = 11; i >= 0; i--) {
+    for (let i = 29; i >= 0; i--) {
       const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
       
-      // Add multiple factors to create more realistic variability
+      // Add multiple factors to create realistic variability
       
       // Trend component - general market growth
-      const trendFactor = i * 0.3;
+      const trendFactor = (29-i) * 0.15;
       
       // Seasonal component - higher volumes in certain months (e.g., Q4, end of fiscal year)
       const seasonalFactor = Math.sin(i * Math.PI/6) * 3.5;
@@ -521,11 +524,18 @@ export class PostgresStorage implements IStorage {
       // Market volatility component - random fluctuations
       const volatilityBase = Math.random() * 4 - 2; // Random between -2 and 2
       
-      // Occasional market events - significant spikes or drops
-      const marketEvent = (i % 4 === 0) ? (Math.random() * 8 - 4) : 0; // Every 4 months
+      // Market cycles - longer term patterns in trading activity
+      const marketCycle = Math.sin(i * Math.PI/12) * 5; // Yearly cycle
+      
+      // Major market events - significant spikes or drops at specific times
+      let marketEvent = 0;
+      if (i === 18) marketEvent = -8; // Market crash
+      else if (i === 12) marketEvent = 10; // Bull market
+      else if (i === 5) marketEvent = 5; // Recovery
+      else if (i % 4 === 0) marketEvent = (Math.random() * 8 - 4); // Quarterly events
       
       // Calculate final volume with all factors
-      const volume = baseVolume + trendFactor + seasonalFactor + volatilityBase + marketEvent;
+      const volume = baseVolume + trendFactor + seasonalFactor + volatilityBase + marketCycle + marketEvent;
       
       // Update base volume for next iteration to create dependencies between months
       // Volume growth has momentum (market trends tend to continue)
@@ -542,17 +552,17 @@ export class PostgresStorage implements IStorage {
   }
 
   private generateMockAucHistory() {
-    // Past 12 months data with more variability in each asset class
+    // Past 30 months data with more variability in each asset class
     const now = new Date();
     const data = [];
     
-    // Starting values for each asset class
-    let equity = 42;
-    let fixedIncome = 35;
-    let mutualFunds = 18;
-    let others = 9;
+    // Starting values for each asset class (lower values to show growth over time)
+    let equity = 30;
+    let fixedIncome = 26;
+    let mutualFunds = 12;
+    let others = 6;
     
-    for (let i = 11; i >= 0; i--) {
+    for (let i = 29; i >= 0; i--) {
       const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
       
       // Market conditions affect each asset class differently
@@ -616,14 +626,14 @@ export class PostgresStorage implements IStorage {
   }
 
   private generateMockIncomeHistory() {
-    // Past 12 months data with more variability
+    // Past 30 months data with more variability
     const now = new Date();
     const data = [];
     
-    // Base income value
-    let baseIncome = 2.2;
+    // Base income value (start lower to show growth)
+    let baseIncome = 1.6;
     
-    for (let i = 11; i >= 0; i--) {
+    for (let i = 29; i >= 0; i--) {
       const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
       
       // Income is affected by several factors
