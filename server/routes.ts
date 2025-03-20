@@ -267,11 +267,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // First, clear all existing customer growth data
       await db.delete(customerGrowth);
       
+      console.log("Starting to regenerate customer growth data with proper integrity");
+      
       // Generate new data with proper data integrity
       const now = new Date();
       let totalCustomers = 8000; // Starting total for first month
       
-      // Generate 30 months of data
+      // Generate 30 months of data - inserting one by one to guarantee order
       for (let i = 29; i >= 0; i--) {
         const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
         
@@ -298,18 +300,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
           newCustomers = Math.max(30, Math.floor(baseNewCustomers + seasonalNewCustomers + randomNewCustomers + marketEvent + growthTrend));
         }
         
-        // Insert into the database with proper incrementing total customers
+        // Insert each record immediately to ensure order integrity
         await db.insert(customerGrowth).values({
           date: date,
           totalCustomers: totalCustomers,
           newCustomers: newCustomers
         });
         
+        console.log(`Month ${i}: Date=${date.toISOString().substring(0,10)}, Total=${totalCustomers}, New=${newCustomers}`);
+        
         // Update total customers for next month - ENSURING DATA INTEGRITY
-        if (i > 0) { // For all but the last month
-          totalCustomers = totalCustomers + newCustomers;
-        }
+        totalCustomers = totalCustomers + newCustomers;
       }
+      
+      console.log("Finished regenerating customer growth data");
       
       res.json({ message: "Customer growth data regenerated successfully with data integrity" });
     } catch (error) {
