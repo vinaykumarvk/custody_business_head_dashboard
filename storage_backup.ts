@@ -82,68 +82,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getCustomerSegments(): Promise<CustomerSegments[]> {
-    // First check if we have existing data in the customerSegments table
-    const existingSegments = await db.select().from(customerSegments);
-    if (existingSegments.length > 0) {
-      return existingSegments;
-    }
-    
-    // Otherwise, generate segments from monthly customer data
-    const monthlyData = await this.getMonthlyCustomerData();
-    
-    // If no monthly data, return empty array
-    if (monthlyData.length === 0) {
-      return [];
-    }
-    
-    // Get the most recent monthly data record
-    const latestData = monthlyData.sort((a, b) => 
-      new Date(b.month).getTime() - new Date(a.month).getTime()
-    )[0];
-    
-    // Calculate total customers
-    const total = latestData.institutional + latestData.corporate + latestData.hni + latestData.funds;
-    
-    if (total === 0) {
-      return [];
-    }
-    
-    // Calculate percentages from segments
-    const segments = [
-      {
-        id: 1,
-        segmentName: "Institutional",
-        percentage: ((latestData.institutional / total) * 100).toFixed(1)
-      },
-      {
-        id: 2,
-        segmentName: "Corporate",
-        percentage: ((latestData.corporate / total) * 100).toFixed(1)
-      },
-      {
-        id: 3,
-        segmentName: "High Net Worth",
-        percentage: ((latestData.hni / total) * 100).toFixed(1)
-      },
-      {
-        id: 4,
-        segmentName: "Funds",
-        percentage: ((latestData.funds / total) * 100).toFixed(1)
-      }
-    ];
-    
-    // Store segments in database for future use
-    for (const segment of segments) {
-      await db.insert(customerSegments).values({
-        segmentName: segment.segmentName,
-        percentage: segment.percentage
-      }).onConflictDoUpdate({
-        target: customerSegments.id,
-        set: { percentage: segment.percentage }
-      });
-    }
-    
-    return segments;
+    return db.select().from(customerSegments);
   }
 
   async getTradingVolume(): Promise<TradingVolume[]> {

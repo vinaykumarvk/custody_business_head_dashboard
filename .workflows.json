@@ -1,0 +1,10 @@
+{
+  "workflows": [
+    {
+      "name": "Angular App",
+      "command": "cd angular-client && npx ng serve --port 5000 --host 0.0.0.0 --disable-host-check",
+      "restartable": true,
+      "ephemeral": false
+    }
+  ]
+}
