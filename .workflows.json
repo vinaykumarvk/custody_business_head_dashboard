@@ -1,8 +1,7 @@
 {
-  "workflows": [
-    {
-      "name": "Angular Dashboard",
-      "command": "cd angular-client && npx ng serve --port 4200 --host 0.0.0.0 --disable-host-check"
+  "workflows": {
+    "express-server": {
+      "command": "cd server && npx tsx index.ts"
     }
-  ]
+  }
 }

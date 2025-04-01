@@ -14,6 +14,7 @@ export class TopCustomersTableComponent {
   
   // For numeric formatting
   Math = Math;
+  parseFloat = parseFloat;
   
   // Function to determine if change percent is positive
   isPositive(changePercent: string | number): boolean {

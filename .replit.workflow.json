@@ -1,0 +1,16 @@
+{
+  "workflows": [
+    {
+      "id": "start-server",
+      "name": "Start Server",
+      "command": "npx tsx server/index.ts",
+      "ports": [5000]
+    },
+    {
+      "id": "start-angular",
+      "name": "Start Angular",
+      "command": "cd angular-client && npx ng serve --port 4200 --host 0.0.0.0 --disable-host-check",
+      "ports": [4200]
+    }
+  ]
+}

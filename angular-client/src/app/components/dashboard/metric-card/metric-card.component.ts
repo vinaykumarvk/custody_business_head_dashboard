@@ -10,20 +10,32 @@ import { CommonModule } from '@angular/common';
 })
 export class MetricCardComponent {
   @Input() title: string = '';
-  @Input() value: string = '';
+  @Input() value: number | string = '';
   @Input() icon?: string;
   @Input() subtitle?: string;
   @Input() change?: number;
+  @Input() changePercent?: number;
   @Input() backgroundColor: string = 'white';
   @Input() textColor: string = '#2448a5';
   @Input() accentColor?: string;
   @Input() category?: 'customers' | 'revenue';
+  @Input() colorClass?: string;
   
   // Make Math available to the template
   Math = Math;
 
   get isPositive(): boolean {
-    return this.change !== undefined && this.change >= 0;
+    if (this.change !== undefined) {
+      return this.change >= 0;
+    }
+    if (this.changePercent !== undefined) {
+      return this.changePercent >= 0;
+    }
+    return true;
+  }
+
+  get displayChange(): number | undefined {
+    return this.change !== undefined ? this.change : this.changePercent;
   }
 
   get borderColor(): string {

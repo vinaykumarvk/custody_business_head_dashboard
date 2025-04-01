@@ -42,12 +42,12 @@ export class CustomerSegmentsChartComponent implements OnChanges, OnDestroy, Aft
     const ctx = this.chartCanvas.nativeElement.getContext('2d');
     if (!ctx) return;
 
-    const labels = this.data.map(segment => segment.segmentName);
-    const percentages = this.data.map(segment => {
-      return typeof segment.percentage === 'string' 
-        ? parseFloat(segment.percentage) 
-        : segment.percentage;
-    });
+    const labels = this.data.map(segment => segment.segment);
+    const counts = this.data.map(segment => segment.count);
+
+    // Calculate percentages
+    const total = counts.reduce((sum, count) => sum + count, 0);
+    const percentages = counts.map(count => ((count / total) * 100));
 
     this.chartInstance = new Chart(ctx, {
       type: 'doughnut',
@@ -81,8 +81,8 @@ export class CustomerSegmentsChartComponent implements OnChanges, OnDestroy, Aft
             callbacks: {
               label: (context) => {
                 const label = context.label || '';
-                const value = context.raw;
-                return `${label}: ${value}%`;
+                const value = context.raw as number;
+                return `${label}: ${value.toFixed(1)}%`;
               }
             }
           }

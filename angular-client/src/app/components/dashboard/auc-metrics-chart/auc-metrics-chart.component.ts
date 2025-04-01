@@ -15,6 +15,10 @@ export class AucMetricsChartComponent implements OnChanges, OnDestroy, AfterView
   @ViewChild('chartCanvas') chartCanvas!: ElementRef<HTMLCanvasElement>;
   
   chartInstance: Chart | null = null;
+  
+  // Making these available to the template
+  parseFloat = parseFloat;
+  Math = Math;
 
   ngAfterViewInit() {
     this.createChart();

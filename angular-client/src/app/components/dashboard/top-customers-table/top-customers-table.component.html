@@ -22,7 +22,7 @@
             <span [class]="isPositive(customer.changePercent) ? 'positive-change' : 'negative-change'">
               <i [class]="'ri-arrow-' + (isPositive(customer.changePercent) ? 'up' : 'down') + '-line'"></i>
               {{isPositive(customer.changePercent) ? '' : '('}}
-              {{Math.abs(typeof customer.changePercent === 'string' ? parseFloat(customer.changePercent) : customer.changePercent)}}%
+              {{Math.abs(customer.changePercent)}}%
               {{isPositive(customer.changePercent) ? '' : ')'}}
             </span>
           </td>

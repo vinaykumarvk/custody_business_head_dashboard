@@ -1,7 +1,7 @@
 import { Component, ElementRef, Input, OnChanges, OnDestroy, SimpleChanges, ViewChild, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import Chart from 'chart.js/auto';
-import { CustomerGrowth } from '../../../interfaces/dashboard.interface';
+import { CustomerGrowth, CustomerHistory } from '../../../interfaces/dashboard.interface';
 
 @Component({
   selector: 'app-customer-growth-chart',
@@ -12,6 +12,7 @@ import { CustomerGrowth } from '../../../interfaces/dashboard.interface';
 })
 export class CustomerGrowthChartComponent implements OnChanges, OnDestroy, AfterViewInit {
   @Input() data: CustomerGrowth[] = [];
+  @Input() historyData: CustomerHistory[] = [];
   @ViewChild('chartCanvas') chartCanvas!: ElementRef<HTMLCanvasElement>;
   
   chartInstance: Chart | null = null;
@@ -23,7 +24,7 @@ export class CustomerGrowthChartComponent implements OnChanges, OnDestroy, After
   }
 
   ngOnChanges(changes: SimpleChanges) {
-    if (changes['data'] && this.chartCanvas) {
+    if ((changes['data'] || changes['historyData']) && this.chartCanvas) {
       this.createChart();
     }
   }
@@ -52,21 +53,29 @@ export class CustomerGrowthChartComponent implements OnChanges, OnDestroy, After
     // Filter data based on selected time range
     const now = new Date();
     let filteredData = [...this.data];
+    let filteredHistoryData = [...this.historyData || []];
     
     if (this.selectedTimeRange === '3M') {
       const last3Months = this.subMonths(now, 3);
       filteredData = this.data.filter(item => new Date(item.date) >= last3Months);
+      filteredHistoryData = this.historyData ? this.historyData.filter(item => new Date(item.date) >= last3Months) : [];
     } else if (this.selectedTimeRange === '6M') {
       const last6Months = this.subMonths(now, 6);
       filteredData = this.data.filter(item => new Date(item.date) >= last6Months);
+      filteredHistoryData = this.historyData ? this.historyData.filter(item => new Date(item.date) >= last6Months) : [];
     } else if (this.selectedTimeRange === '1Y') {
       const lastYear = this.subMonths(now, 12);
       filteredData = this.data.filter(item => new Date(item.date) >= lastYear);
+      filteredHistoryData = this.historyData ? this.historyData.filter(item => new Date(item.date) >= lastYear) : [];
     }
 
     const labels = filteredData.map(item => this.formatDate(new Date(item.date)));
-    const totalCustomersData = filteredData.map(item => item.totalCustomers);
-    const newCustomersData = filteredData.map(item => item.newCustomers);
+    const customersData = filteredData.map(item => item.customers);
+    
+    // Get new customers data from history data if available
+    const newCustomersData = filteredHistoryData && filteredHistoryData.length > 0 
+      ? filteredHistoryData.map(item => item.newCustomers)
+      : [];
 
     this.chartInstance = new Chart(ctx, {
       type: 'line',
@@ -75,7 +84,7 @@ export class CustomerGrowthChartComponent implements OnChanges, OnDestroy, After
         datasets: [
           {
             label: 'Total Customers',
-            data: totalCustomersData,
+            data: customersData,
             borderColor: '#2448a5',
             backgroundColor: 'rgba(36, 72, 165, 0.1)',
             borderWidth: 2,
