@@ -48,7 +48,7 @@ mode = "sequential"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "cd angular-client && npm run start"
+args = "cd angular-client && ng serve --host 0.0.0.0 --port 4200"
 
 [[workflows.workflow]]
 name = "Run React"
