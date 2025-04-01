@@ -93,7 +93,7 @@
               "Access-Control-Allow-Origin": "*"
             },
             "allowedHosts": [
-              "all"
+              "6c6aab51-3526-41a6-8188-28ed0456fdd5-00-kilzlk5rvx2x.worf.replit.dev"
             ]
           },
           "configurations": {
