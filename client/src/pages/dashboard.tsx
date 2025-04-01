@@ -1,18 +1,18 @@
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { FiUsers, FiUserPlus, FiDollarSign, FiBarChart2 } from 'react-icons/fi';
-import { Skeleton } from "@/components/ui/skeleton";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Skeleton } from "../components/ui/skeleton";
+import { Alert, AlertDescription, AlertTitle } from "../components/ui/alert";
 import { AlertCircle } from "lucide-react";
 
-import MetricCard from '@/components/dashboard/metric-card';
-import CustomerGrowthChart from '@/components/dashboard/customer-growth-chart';
-import CustomerSegmentsChart from '@/components/dashboard/customer-segments-chart';
-import TradingVolumeChart from '@/components/dashboard/trading-volume-chart';
-import AucHistoryChart from '@/components/dashboard/auc-history-chart';
-import IncomeHistoryChart from '@/components/dashboard/income-history-chart';
-import IncomeByServiceChart from '@/components/dashboard/income-by-service-chart';
-import TopCustomersTable from '@/components/dashboard/top-customers-table';
+import MetricCard from '../components/dashboard/metric-card';
+import CustomerGrowthChart from '../components/dashboard/customer-growth-chart';
+import CustomerSegmentsChart from '../components/dashboard/customer-segments-chart';
+import TradingVolumeChart from '../components/dashboard/trading-volume-chart';
+import AucHistoryChart from '../components/dashboard/auc-history-chart';
+import IncomeHistoryChart from '../components/dashboard/income-history-chart';
+import IncomeByServiceChart from '../components/dashboard/income-by-service-chart';
+import TopCustomersTable from '../components/dashboard/top-customers-table';
 
 // Interface definitions for API responses
 interface CustomerMetricsData {

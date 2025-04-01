@@ -1,3 +1,2 @@
-{
-  "run": "cd server && npx tsx index.ts"
-}
+# Workflow file
+run = "bash ./start_angular.sh"
