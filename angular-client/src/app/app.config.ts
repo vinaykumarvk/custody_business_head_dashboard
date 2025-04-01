@@ -8,7 +8,7 @@ export const appConfig: ApplicationConfig = {
     provideRouter(routes),
     {
       provide: 'SERVER_URL',
-      useValue: 'http://0.0.0.0:5000'
+      useValue: 'http://0.0.0.0:3000'
     }
   ]
 };
