@@ -92,7 +92,9 @@
             "headers": {
               "Access-Control-Allow-Origin": "*"
             },
-            "allowedHosts": ["*"]
+            "allowedHosts": [
+              "all"
+            ]
           },
           "configurations": {
             "production": {
