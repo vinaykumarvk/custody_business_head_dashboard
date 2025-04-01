@@ -7,28 +7,28 @@ import { MetricCardComponent } from './metric-card/metric-card.component';
   selector: 'app-dashboard',
   standalone: true,
   imports: [CommonModule, MetricCardComponent],
-  template: `
-    <div class="dashboard">
-      <h1>Custody Dashboard</h1>
-      <div class="metrics-grid">
-        <app-metric-card
-          title="Total Customers"
-          value="13,820"
-          trend="+12%"
-        />
-      </div>
-    </div>
-  `,
-  styles: [`
-    .dashboard {
-      padding: 20px;
-    }
-    .metrics-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 20px;
-      margin-top: 20px;
-    }
-  `]
+  templateUrl: './dashboard.component.html',
+  styleUrls: ['./dashboard.component.scss']
 })
-export class DashboardComponent {}
+export class DashboardComponent {
+  customerMetrics = {
+    totalCustomers: 13820,
+    activeCustomers: 9240,
+    newCustomersMTD: 342
+  };
+
+  aucMetrics = {
+    totalAuc: '157.3',
+    growth: 5.2
+  };
+
+  income = {
+    incomeMTD: '12.4',
+    outstandingFees: '3.2',
+    growth: 7.8
+  };
+
+  formatNumberWithCommas(num: number): string {
+    return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  }
+}
