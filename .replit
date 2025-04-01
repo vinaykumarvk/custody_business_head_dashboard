@@ -23,7 +23,7 @@ localPort = 5000
 externalPort = 80
 
 [workflows]
-runButton = "Run Apps Swapped Ports"
+runButton = "Run Angular Dev"
 
 [[workflows.workflow]]
 name = "Project"
@@ -101,3 +101,12 @@ args = "cd angular-client && ng serve --configuration development --host 0.0.0.0
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "cd client && npm run dev -- --port 4200"
+
+[[workflows.workflow]]
+name = "Run Angular Dev"
+author = 36334230
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "cd angular-client && ng serve --configuration development --host 0.0.0.0 --port 5000"
