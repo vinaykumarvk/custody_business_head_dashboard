@@ -12,6 +12,13 @@ async function main() {
   // Configure JSON middleware
   app.use(json());
   
+  // Configure CORS headers
+  app.use((req, res, next) => {
+    res.header('Access-Control-Allow-Origin', '*');
+    res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+    next();
+  });
+  
   // Session configuration
   app.use(
     session({
@@ -39,7 +46,7 @@ async function main() {
   });
   
   // Start the server
-  server.listen(PORT, '0.0.0.0', () => {
+  server.listen(Number(PORT), '0.0.0.0', () => {
     log(`serving on port ${PORT}`);
   });
 }

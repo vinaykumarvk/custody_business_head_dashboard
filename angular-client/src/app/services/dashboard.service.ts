@@ -7,7 +7,7 @@ import * as interfaces from '../interfaces/dashboard.interface';
   providedIn: 'root'
 })
 export class DashboardService {
-  private apiUrl = '/api';
+  private apiUrl = 'http://localhost:5000/api';
 
   constructor(private http: HttpClient) {}
 
