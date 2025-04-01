@@ -18,6 +18,9 @@ export class MetricCardComponent {
   @Input() textColor: string = '#2448a5';
   @Input() accentColor?: string;
   @Input() category?: 'customers' | 'revenue';
+  
+  // Make Math available to the template
+  Math = Math;
 
   get isPositive(): boolean {
     return this.change !== undefined && this.change >= 0;

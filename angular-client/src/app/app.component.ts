@@ -9,6 +9,8 @@ import { DashboardComponent } from './components/dashboard/dashboard.component';
   imports: [RouterOutlet, CommonModule, DashboardComponent],
   template: `
     <main class="app-container">
+      <h1 class="dashboard-title">{{title}}</h1>
+      <app-dashboard></app-dashboard>
       <router-outlet />
     </main>
   `,
@@ -17,6 +19,14 @@ import { DashboardComponent } from './components/dashboard/dashboard.component';
       padding: 20px;
       height: 100vh;
       background-color: #F8FAFC;
+      overflow-y: auto;
+    }
+    
+    .dashboard-title {
+      color: #2448a5;
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin-bottom: 20px;
     }
   `],
 })
