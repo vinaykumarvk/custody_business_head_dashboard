@@ -5,6 +5,32 @@ import path from "path";
 import { json } from "express";
 import { log, setupVite } from "./vite";
 import { registerRoutes } from "./routes";
+// Define cors as a plain function since we don't have the package
+function cors(options?: { origin?: string | string[]; methods?: string[] }) {
+  return (req: express.Request, res: express.Response, next: express.NextFunction) => {
+    const requestOrigin = req.headers.origin;
+    const allowedOrigins = options?.origin || '*';
+
+    // Set CORS headers
+    if (typeof allowedOrigins === 'string') {
+      res.header('Access-Control-Allow-Origin', allowedOrigins);
+    } else if (Array.isArray(allowedOrigins) && requestOrigin) {
+      if (allowedOrigins.includes(requestOrigin)) {
+        res.header('Access-Control-Allow-Origin', requestOrigin);
+      }
+    }
+    
+    res.header('Access-Control-Allow-Methods', options?.methods?.join(',') || 'GET,HEAD,PUT,PATCH,POST,DELETE');
+    res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
+    
+    // Handle preflight requests
+    if (req.method === 'OPTIONS') {
+      return res.status(200).end();
+    }
+    
+    next();
+  };
+}
 
 async function main() {
   const app = express();
@@ -12,12 +38,11 @@ async function main() {
   // Configure JSON middleware
   app.use(json());
   
-  // Configure CORS headers
-  app.use((req, res, next) => {
-    res.header('Access-Control-Allow-Origin', '*');
-    res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
-    next();
-  });
+  // Configure CORS with specific origins
+  app.use(cors({
+    origin: ['http://localhost:4200', 'http://localhost:3000'],
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS']
+  }));
   
   // Session configuration
   app.use(

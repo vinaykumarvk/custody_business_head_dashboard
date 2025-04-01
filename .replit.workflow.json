@@ -1,10 +1,11 @@
 {
-  "run": "bash start_server.sh & bash start_angular.sh",
-  "language": "nodejs",
-  "onBoot": "",
-  "preview": {
-    "Virtual Desktop": true,
-    "Database": true,
-    "WebView": true
+  "workflow": {
+    "terminal": {
+      "Start Developer Environment": {
+        "cmd": "./start_both.sh",
+        "persistent": true,
+        "restart": true
+      }
+    }
   }
 }
