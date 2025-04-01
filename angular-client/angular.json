@@ -91,7 +91,8 @@
             "port": 4200,
             "headers": {
               "Access-Control-Allow-Origin": "*"
-            }
+            },
+            "allowedHosts": ["*"]
           },
           "configurations": {
             "production": {
