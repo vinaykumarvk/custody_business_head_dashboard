@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Custody Dashboard App</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f5f7f9;
+      color: #333;
+    }
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+    h1 {
+      color: #2448a5;
+      margin-bottom: 2rem;
+      text-align: center;
+    }
+    .app-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 2rem;
+    }
+    .app-card {
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .app-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    }
+    .card-header {
+      background-color: #2448a5;
+      color: white;
+      padding: 1.5rem;
+    }
+    .card-header h2 {
+      margin: 0;
+    }
+    .card-body {
+      padding: 1.5rem;
+    }
+    .card-body p {
+      margin-bottom: 1.5rem;
+      line-height: 1.6;
+    }
+    .btn {
+      display: inline-block;
+      background-color: #2448a5;
+      color: white;
+      text-decoration: none;
+      padding: 0.8rem 1.5rem;
+      border-radius: 4px;
+      font-weight: 500;
+      transition: background-color 0.3s ease;
+    }
+    .btn:hover {
+      background-color: #1a3675;
+    }
+    .system-info {
+      margin-top: 3rem;
+      background-color: white;
+      border-radius: 8px;
+      padding: 1.5rem;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    .system-info h3 {
+      color: #2448a5;
+      margin-top: 0;
+    }
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1rem;
+    }
+    .info-item {
+      background-color: #f0f4fc;
+      padding: 1rem;
+      border-radius: 4px;
+    }
+    .info-item strong {
+      display: block;
+      margin-bottom: 0.5rem;
+      color: #2448a5;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Custody Dashboard Application</h1>
+    
+    <div class="app-cards">
+      <div class="app-card">
+        <div class="card-header">
+          <h2>Angular Dashboard</h2>
+        </div>
+        <div class="card-body">
+          <p>Access the business custody dashboard built with Angular, featuring interactive charts, metric cards, and data tables.</p>
+          <a href="/api/angular" class="btn">Open Angular Dashboard</a>
+        </div>
+      </div>
+      
+      <div class="app-card">
+        <div class="card-header">
+          <h2>React Dashboard</h2>
+        </div>
+        <div class="card-body">
+          <p>Access the business custody dashboard built with React, offering the same data visualization with a React implementation.</p>
+          <a href="/api/react" class="btn">Open React Dashboard</a>
+        </div>
+      </div>
+    </div>
+    
+    <div class="system-info">
+      <h3>System Information</h3>
+      <div class="info-grid">
+        <div class="info-item">
+          <strong>Angular Server</strong>
+          <span>Running on port 4200</span>
+        </div>
+        <div class="info-item">
+          <strong>React Server</strong>
+          <span>Running on port 3000</span>
+        </div>
+        <div class="info-item">
+          <strong>API Server</strong>
+          <span>Running on port 5000</span>
+        </div>
+        <div class="info-item">
+          <strong>Database</strong>
+          <span>PostgreSQL (connected)</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
