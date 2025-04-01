@@ -1,0 +1,22 @@
+
+<div class="relative bg-white rounded-md shadow-sm p-5 transition-all hover:shadow-md overflow-hidden">
+  <div class="absolute top-0 left-0 h-full w-1.5" [style.backgroundColor]="borderColor"></div>
+  
+  <div class="flex justify-between items-start pl-3">
+    <div>
+      <h3 class="text-custodyGray text-sm font-medium mb-1 font-roboto">{{ title }}</h3>
+      <p class="text-2xl font-medium text-custodyBlue font-roboto font-variant-numeric tabular-nums">{{ value }}</p>
+      <p *ngIf="subtitle" class="text-xs text-custodyGray mt-1 font-roboto">{{ subtitle }}</p>
+      <div *ngIf="change !== undefined" class="flex items-center mt-2">
+        <span [class]="'text-sm font-medium flex items-center ' + (isPositive ? 'text-green-600' : 'text-red-600') + ' font-roboto'">
+          <i [class]="'ri-arrow-' + (isPositive ? 'up' : 'down') + '-line mr-1'"></i>
+          {{ Math.abs(change) }}%
+        </span>
+        <span class="text-xs text-custodyGray ml-2">vs last month</span>
+      </div>
+    </div>
+    <div *ngIf="icon" class="p-3 bg-custodyLightBlue rounded-full">
+      <i [class]="'ri-' + icon + '-line text-custodyBlue text-xl'"></i>
+    </div>
+  </div>
+</div>

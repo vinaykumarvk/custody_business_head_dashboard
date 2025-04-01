@@ -14,10 +14,28 @@
         <app-metric-card
           *ngIf="customerMetrics"
           title="Total Customers"
-          [value]="customerMetrics.totalCustomers"
-          icon="users">
+          [value]="formatNumberWithCommas(customerMetrics.totalCustomers)"
+          icon="users"
+          category="customers">
         </app-metric-card>
-        <!-- Add more metric cards -->
+        
+        <app-metric-card
+          *ngIf="customerMetrics"
+          title="Active Customers"
+          [value]="formatNumberWithCommas(customerMetrics.activeCustomers)"
+          icon="users"
+          subtitle="Monthly active customers"
+          category="customers">
+        </app-metric-card>
+        
+        <app-metric-card
+          *ngIf="customerMetrics"
+          title="New Customers MTD"
+          [value]="formatNumberWithCommas(customerMetrics.newCustomersMTD)"
+          icon="user-plus"
+          [change]="4.7"
+          category="customers">
+        </app-metric-card>
       </div>
 
       <!-- Customer Charts -->
