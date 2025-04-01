@@ -1,8 +1,8 @@
 {
-  "workflows": [
-    {
-      "name": "Run Application",
-      "command": "npm run dev"
-    }
-  ]
+  "Start Server": {
+    "command": "npm run dev"
+  },
+  "Start Angular": {
+    "command": "cd angular-client && npx ng serve --port 4200 --host 0.0.0.0 --disable-host-check"
+  }
 }
