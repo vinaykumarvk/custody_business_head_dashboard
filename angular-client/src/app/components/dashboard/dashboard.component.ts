@@ -1,8 +1,7 @@
 
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MetricCardComponent } from './metric-card/metric-card.component';
-import { DashboardService } from '../../services/dashboard.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -32,10 +31,4 @@ import { DashboardService } from '../../services/dashboard.service';
     }
   `]
 })
-export class DashboardComponent implements OnInit {
-  constructor(private dashboardService: DashboardService) {}
-
-  ngOnInit() {
-    // Initialize dashboard data
-  }
-}
+export class DashboardComponent {}
