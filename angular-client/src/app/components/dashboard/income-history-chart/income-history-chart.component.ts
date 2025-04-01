@@ -1,17 +1,17 @@
 import { Component, ElementRef, Input, OnChanges, OnDestroy, SimpleChanges, ViewChild, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import Chart from 'chart.js/auto';
-import { CustomerGrowth } from '../../../interfaces/dashboard.interface';
+import { IncomeHistory } from '../../../interfaces/dashboard.interface';
 
 @Component({
-  selector: 'app-customer-growth-chart',
+  selector: 'app-income-history-chart',
   standalone: true,
   imports: [CommonModule],
-  templateUrl: './customer-growth-chart.component.html',
-  styleUrls: ['./customer-growth-chart.component.scss']
+  templateUrl: './income-history-chart.component.html',
+  styleUrls: ['./income-history-chart.component.scss']
 })
-export class CustomerGrowthChartComponent implements OnChanges, OnDestroy, AfterViewInit {
-  @Input() data: CustomerGrowth[] = [];
+export class IncomeHistoryChartComponent implements OnChanges, OnDestroy, AfterViewInit {
+  @Input() data: IncomeHistory[] = [];
   @ViewChild('chartCanvas') chartCanvas!: ElementRef<HTMLCanvasElement>;
   
   chartInstance: Chart | null = null;
@@ -64,9 +64,16 @@ export class CustomerGrowthChartComponent implements OnChanges, OnDestroy, After
       filteredData = this.data.filter(item => new Date(item.date) >= lastYear);
     }
 
+    // Sort data by date
+    filteredData.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+
     const labels = filteredData.map(item => this.formatDate(new Date(item.date)));
-    const totalCustomersData = filteredData.map(item => item.totalCustomers);
-    const newCustomersData = filteredData.map(item => item.newCustomers);
+    const amounts = filteredData.map(item => typeof item.income === 'string' ? parseFloat(item.income) : item.income);
+
+    // Calculate gradient
+    const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+    gradient.addColorStop(0, 'rgba(36, 72, 165, 0.4)');
+    gradient.addColorStop(1, 'rgba(36, 72, 165, 0.0)');
 
     this.chartInstance = new Chart(ctx, {
       type: 'line',
@@ -74,24 +81,14 @@ export class CustomerGrowthChartComponent implements OnChanges, OnDestroy, After
         labels: labels,
         datasets: [
           {
-            label: 'Total Customers',
-            data: totalCustomersData,
+            label: 'Income (USD Millions)',
+            data: amounts,
             borderColor: '#2448a5',
-            backgroundColor: 'rgba(36, 72, 165, 0.1)',
+            backgroundColor: gradient,
             borderWidth: 2,
-            fill: false,
-            tension: 0.2,
+            fill: true,
+            tension: 0.3,
             pointBackgroundColor: '#2448a5'
-          },
-          {
-            label: 'New Customers',
-            data: newCustomersData,
-            borderColor: '#7b7b7b',
-            backgroundColor: 'rgba(123, 123, 123, 0.1)',
-            borderWidth: 2,
-            fill: false,
-            tension: 0.2,
-            pointBackgroundColor: '#7b7b7b'
           }
         ]
       },
@@ -109,12 +106,14 @@ export class CustomerGrowthChartComponent implements OnChanges, OnDestroy, After
             }
           },
           y: {
-            beginAtZero: false,
+            beginAtZero: true,
             grid: {
               color: 'rgba(0, 0, 0, 0.05)'
             },
             ticks: {
-              precision: 0
+              callback: function(value) {
+                return '$' + value + 'M';
+              }
             }
           }
         },
@@ -122,15 +121,14 @@ export class CustomerGrowthChartComponent implements OnChanges, OnDestroy, After
           tooltip: {
             mode: 'index',
             intersect: false,
+            callbacks: {
+              label: function(context) {
+                return 'Income: $' + context.parsed.y + 'M';
+              }
+            }
           },
           legend: {
-            position: 'top',
-            align: 'end',
-            labels: {
-              boxWidth: 12,
-              usePointStyle: true,
-              pointStyle: 'circle'
-            }
+            display: false
           }
         },
         interaction: {

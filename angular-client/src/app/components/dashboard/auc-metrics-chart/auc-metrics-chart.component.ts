@@ -1,17 +1,17 @@
 import { Component, ElementRef, Input, OnChanges, OnDestroy, SimpleChanges, ViewChild, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import Chart from 'chart.js/auto';
-import { CustomerSegment } from '../../../interfaces/dashboard.interface';
+import { AucMetrics } from '../../../interfaces/dashboard.interface';
 
 @Component({
-  selector: 'app-customer-segments-chart',
+  selector: 'app-auc-metrics-chart',
   standalone: true,
   imports: [CommonModule],
-  templateUrl: './customer-segments-chart.component.html',
-  styleUrls: ['./customer-segments-chart.component.scss']
+  templateUrl: './auc-metrics-chart.component.html',
+  styleUrls: ['./auc-metrics-chart.component.scss']
 })
-export class CustomerSegmentsChartComponent implements OnChanges, OnDestroy, AfterViewInit {
-  @Input() data: CustomerSegment[] = [];
+export class AucMetricsChartComponent implements OnChanges, OnDestroy, AfterViewInit {
+  @Input() data: AucMetrics | null = null;
   @ViewChild('chartCanvas') chartCanvas!: ElementRef<HTMLCanvasElement>;
   
   chartInstance: Chart | null = null;
@@ -33,7 +33,7 @@ export class CustomerSegmentsChartComponent implements OnChanges, OnDestroy, Aft
   }
 
   private createChart() {
-    if (!this.chartCanvas || !this.data || this.data.length === 0) return;
+    if (!this.chartCanvas || !this.data) return;
 
     if (this.chartInstance) {
       this.chartInstance.destroy();
@@ -42,27 +42,28 @@ export class CustomerSegmentsChartComponent implements OnChanges, OnDestroy, Aft
     const ctx = this.chartCanvas.nativeElement.getContext('2d');
     if (!ctx) return;
 
-    const labels = this.data.map(segment => segment.segmentName);
-    const percentages = this.data.map(segment => {
-      return typeof segment.percentage === 'string' 
-        ? parseFloat(segment.percentage) 
-        : segment.percentage;
-    });
+    const labels = ['Equity', 'Fixed Income', 'Mutual Funds', 'Others'];
+    const values = [
+      parseFloat(this.data.equity.toString()),
+      parseFloat(this.data.fixedIncome.toString()),
+      parseFloat(this.data.mutualFunds.toString()),
+      parseFloat(this.data.others.toString())
+    ];
 
     this.chartInstance = new Chart(ctx, {
-      type: 'doughnut',
+      type: 'pie',
       data: {
         labels: labels,
         datasets: [{
-          data: percentages,
+          data: values,
           backgroundColor: [
             '#2448a5',  // Blue
             '#C6DBFC',  // Light Blue
             '#7b7b7b',  // Gray
-            '#90CAF9'   // Another shade of blue
+            '#DAE9FF'   // Another shade of light blue
           ],
-          borderWidth: 0,
-          hoverOffset: 4
+          borderWidth: 1,
+          borderColor: '#ffffff'
         }]
       },
       options: {
@@ -70,7 +71,7 @@ export class CustomerSegmentsChartComponent implements OnChanges, OnDestroy, Aft
         maintainAspectRatio: false,
         plugins: {
           legend: {
-            position: 'bottom',
+            position: 'right',
             labels: {
               padding: 15,
               usePointStyle: true,
@@ -81,13 +82,14 @@ export class CustomerSegmentsChartComponent implements OnChanges, OnDestroy, Aft
             callbacks: {
               label: (context) => {
                 const label = context.label || '';
-                const value = context.raw;
-                return `${label}: ${value}%`;
+                const value = context.raw as number;
+                const total = values.reduce((a, b) => a + b, 0);
+                const percentage = ((value / total) * 100).toFixed(1);
+                return `${label}: $${value}B (${percentage}%)`;
               }
             }
           }
-        },
-        cutout: '65%'
+        }
       }
     });
   }

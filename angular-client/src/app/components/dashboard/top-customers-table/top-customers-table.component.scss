@@ -1,0 +1,89 @@
+.table-container {
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  padding: 16px;
+  margin-bottom: 20px;
+}
+
+.table-title {
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: #2448a5;
+  margin-bottom: 15px;
+}
+
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.customers-table {
+  width: 100%;
+  border-collapse: collapse;
+  
+  th, td {
+    padding: 12px 15px;
+    text-align: left;
+    font-size: 0.95rem;
+  }
+  
+  th {
+    background-color: #f8f9fa;
+    color: #7b7b7b;
+    font-weight: 500;
+    border-bottom: 2px solid #eaecef;
+    white-space: nowrap;
+  }
+  
+  th.text-right, td.text-right {
+    text-align: right;
+  }
+  
+  .customer-name {
+    font-weight: 500;
+    color: #2448a5;
+  }
+  
+  tbody tr {
+    border-bottom: 1px solid #eaecef;
+    
+    &:last-child {
+      border-bottom: none;
+    }
+    
+    &.even-row {
+      background-color: #f8f9fa;
+    }
+  }
+  
+  .change-cell {
+    .positive-change {
+      color: #4caf50;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      
+      i {
+        margin-right: 2px;
+      }
+    }
+    
+    .negative-change {
+      color: #f44336;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      
+      i {
+        margin-right: 2px;
+      }
+    }
+  }
+  
+  .empty-state {
+    text-align: center;
+    color: #7b7b7b;
+    padding: 30px 15px;
+  }
+}

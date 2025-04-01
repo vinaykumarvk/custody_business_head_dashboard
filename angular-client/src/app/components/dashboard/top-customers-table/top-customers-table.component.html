@@ -1,0 +1,38 @@
+<div class="table-container">
+  <div class="table-title">Top Revenue Customers</div>
+  
+  <div class="table-responsive">
+    <table class="customers-table">
+      <thead>
+        <tr>
+          <th>Customer</th>
+          <th>Type</th>
+          <th class="text-right">Revenue</th>
+          <th class="text-right">Assets</th>
+          <th class="text-right">Change</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let customer of data; let i = index" [class.even-row]="i % 2 === 1">
+          <td class="customer-name">{{customer.name}}</td>
+          <td>{{customer.customerType}}</td>
+          <td class="text-right">{{formatCurrency(customer.revenue, 'revenue')}}</td>
+          <td class="text-right">{{formatCurrency(customer.assets, 'assets')}}</td>
+          <td class="text-right change-cell">
+            <span [class]="isPositive(customer.changePercent) ? 'positive-change' : 'negative-change'">
+              <i [class]="'ri-arrow-' + (isPositive(customer.changePercent) ? 'up' : 'down') + '-line'"></i>
+              {{isPositive(customer.changePercent) ? '' : '('}}
+              {{Math.abs(typeof customer.changePercent === 'string' ? parseFloat(customer.changePercent) : customer.changePercent)}}%
+              {{isPositive(customer.changePercent) ? '' : ')'}}
+            </span>
+          </td>
+        </tr>
+        
+        <!-- Show empty state if no data -->
+        <tr *ngIf="data.length === 0">
+          <td colspan="5" class="empty-state">No customer data available</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

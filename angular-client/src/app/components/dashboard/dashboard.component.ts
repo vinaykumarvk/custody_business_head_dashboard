@@ -1,67 +1,258 @@
-
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { DashboardService } from '../../services/dashboard.service';
 import { MetricCardComponent } from './metric-card/metric-card.component';
 import { CustomerGrowthChartComponent } from './customer-growth-chart/customer-growth-chart.component';
 import { CustomerSegmentsChartComponent } from './customer-segments-chart/customer-segments-chart.component';
+import { AucMetricsChartComponent } from './auc-metrics-chart/auc-metrics-chart.component';
+import { TradingVolumeChartComponent } from './trading-volume-chart/trading-volume-chart.component';
+import { TopCustomersTableComponent } from './top-customers-table/top-customers-table.component';
+import { IncomeServiceChartComponent } from './income-service-chart/income-service-chart.component';
+import { IncomeHistoryChartComponent } from './income-history-chart/income-history-chart.component';
+import * as interfaces from '../../interfaces/dashboard.interface';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
   imports: [
-    CommonModule, 
+    CommonModule,
     MetricCardComponent,
     CustomerGrowthChartComponent,
-    CustomerSegmentsChartComponent
+    CustomerSegmentsChartComponent,
+    AucMetricsChartComponent,
+    TradingVolumeChartComponent,
+    TopCustomersTableComponent,
+    IncomeServiceChartComponent,
+    IncomeHistoryChartComponent
   ],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss']
 })
-export class DashboardComponent {
-  error = false;
+export class DashboardComponent implements OnInit {
+  // Data states
+  customerMetrics: interfaces.CustomerMetrics | null = null;
+  customerGrowth: interfaces.CustomerGrowth[] = [];
+  customerSegments: interfaces.CustomerSegment[] = [];
+  tradingVolume: interfaces.TradingVolume[] = [];
+  aucHistory: interfaces.AucHistory[] = [];
+  aucMetrics: interfaces.AucMetrics | null = null;
+  income: interfaces.Income | null = null;
+  incomeByService: interfaces.IncomeByService[] = [];
+  incomeHistory: interfaces.IncomeHistory[] = [];
+  topCustomers: interfaces.TopCustomer[] = [];
   
-  customerMetrics = {
-    totalCustomers: 13820,
-    activeCustomers: 9240,
-    newCustomersMTD: 342
+  // Loading states
+  loading = {
+    customerMetrics: true,
+    customerGrowth: true,
+    customerSegments: true,
+    tradingVolume: true,
+    aucHistory: true,
+    aucMetrics: true,
+    income: true,
+    incomeByService: true,
+    incomeHistory: true,
+    topCustomers: true
   };
 
-  customerGrowth = [
-    { id: 1, date: '2023-01-01', totalCustomers: 10500, newCustomers: 150 },
-    { id: 2, date: '2023-02-01', totalCustomers: 10800, newCustomers: 300 },
-    { id: 3, date: '2023-03-01', totalCustomers: 11050, newCustomers: 250 },
-    { id: 4, date: '2023-04-01', totalCustomers: 11200, newCustomers: 150 },
-    { id: 5, date: '2023-05-01', totalCustomers: 11450, newCustomers: 250 },
-    { id: 6, date: '2023-06-01', totalCustomers: 11650, newCustomers: 200 },
-    { id: 7, date: '2023-07-01', totalCustomers: 11800, newCustomers: 150 },
-    { id: 8, date: '2023-08-01', totalCustomers: 12100, newCustomers: 300 },
-    { id: 9, date: '2023-09-01', totalCustomers: 12350, newCustomers: 250 },
-    { id: 10, date: '2023-10-01', totalCustomers: 12800, newCustomers: 450 },
-    { id: 11, date: '2023-11-01', totalCustomers: 13150, newCustomers: 350 },
-    { id: 12, date: '2023-12-01', totalCustomers: 13400, newCustomers: 250 },
-    { id: 13, date: '2024-01-01', totalCustomers: 13600, newCustomers: 200 },
-    { id: 14, date: '2024-02-01', totalCustomers: 13820, newCustomers: 220 }
-  ];
-
-  customerSegments = [
-    { id: 1, segmentName: 'Institutional', percentage: 45 },
-    { id: 2, segmentName: 'Corporate', percentage: 30 },
-    { id: 3, segmentName: 'HNI', percentage: 15 },
-    { id: 4, segmentName: 'Funds', percentage: 10 }
-  ];
-
-  aucMetrics = {
-    totalAuc: '157.3',
-    growth: 5.2
+  // Error states
+  error = {
+    customerMetrics: false,
+    customerGrowth: false,
+    customerSegments: false,
+    tradingVolume: false,
+    aucHistory: false,
+    aucMetrics: false,
+    income: false,
+    incomeByService: false,
+    incomeHistory: false,
+    topCustomers: false
   };
 
-  income = {
-    incomeMTD: '12.4',
-    outstandingFees: '3.2',
-    growth: 7.8
-  };
+  constructor(private dashboardService: DashboardService) {}
 
-  formatNumberWithCommas(num: number): string {
-    return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  ngOnInit(): void {
+    this.loadAllData();
+  }
+
+  loadAllData(): void {
+    this.loadCustomerMetrics();
+    this.loadCustomerGrowth();
+    this.loadCustomerSegments();
+    this.loadTradingVolume();
+    this.loadAucHistory();
+    this.loadAucMetrics();
+    this.loadIncome();
+    this.loadIncomeHistory();
+    this.loadTopCustomers();
+  }
+
+  loadCustomerMetrics(): void {
+    this.loading.customerMetrics = true;
+    this.error.customerMetrics = false;
+    
+    this.dashboardService.getCustomerMetrics().subscribe({
+      next: (data) => {
+        this.customerMetrics = data;
+        this.loading.customerMetrics = false;
+      },
+      error: (err) => {
+        console.error('Error loading customer metrics', err);
+        this.loading.customerMetrics = false;
+        this.error.customerMetrics = true;
+      }
+    });
+  }
+
+  loadCustomerGrowth(): void {
+    this.loading.customerGrowth = true;
+    this.error.customerGrowth = false;
+    
+    this.dashboardService.getCustomerGrowth().subscribe({
+      next: (data) => {
+        this.customerGrowth = data;
+        this.loading.customerGrowth = false;
+      },
+      error: (err) => {
+        console.error('Error loading customer growth', err);
+        this.loading.customerGrowth = false;
+        this.error.customerGrowth = true;
+      }
+    });
+  }
+
+  loadCustomerSegments(): void {
+    this.loading.customerSegments = true;
+    this.error.customerSegments = false;
+    
+    this.dashboardService.getCustomerSegments().subscribe({
+      next: (data) => {
+        this.customerSegments = data;
+        this.loading.customerSegments = false;
+      },
+      error: (err) => {
+        console.error('Error loading customer segments', err);
+        this.loading.customerSegments = false;
+        this.error.customerSegments = true;
+      }
+    });
+  }
+
+  loadTradingVolume(): void {
+    this.loading.tradingVolume = true;
+    this.error.tradingVolume = false;
+    
+    this.dashboardService.getTradingVolume().subscribe({
+      next: (data) => {
+        this.tradingVolume = data;
+        this.loading.tradingVolume = false;
+      },
+      error: (err) => {
+        console.error('Error loading trading volume', err);
+        this.loading.tradingVolume = false;
+        this.error.tradingVolume = true;
+      }
+    });
+  }
+
+  loadAucHistory(): void {
+    this.loading.aucHistory = true;
+    this.error.aucHistory = false;
+    
+    this.dashboardService.getAucHistory().subscribe({
+      next: (data) => {
+        this.aucHistory = data;
+        this.loading.aucHistory = false;
+      },
+      error: (err) => {
+        console.error('Error loading AUC history', err);
+        this.loading.aucHistory = false;
+        this.error.aucHistory = true;
+      }
+    });
+  }
+
+  loadAucMetrics(): void {
+    this.loading.aucMetrics = true;
+    this.error.aucMetrics = false;
+    
+    this.dashboardService.getAucMetrics().subscribe({
+      next: (data) => {
+        this.aucMetrics = data;
+        this.loading.aucMetrics = false;
+      },
+      error: (err) => {
+        console.error('Error loading AUC metrics', err);
+        this.loading.aucMetrics = false;
+        this.error.aucMetrics = true;
+      }
+    });
+  }
+
+  loadIncome(): void {
+    this.loading.income = true;
+    this.error.income = false;
+    
+    this.dashboardService.getIncome().subscribe({
+      next: (data) => {
+        this.income = data;
+        this.loading.income = false;
+      },
+      error: (err) => {
+        console.error('Error loading income', err);
+        this.loading.income = false;
+        this.error.income = true;
+      }
+    });
+    
+    // Also load income by service data
+    this.loading.incomeByService = true;
+    this.error.incomeByService = false;
+    
+    this.dashboardService.getIncomeByService().subscribe({
+      next: (data) => {
+        this.incomeByService = data;
+        this.loading.incomeByService = false;
+      },
+      error: (err) => {
+        console.error('Error loading income by service', err);
+        this.loading.incomeByService = false;
+        this.error.incomeByService = true;
+      }
+    });
+  }
+  
+  loadIncomeHistory(): void {
+    this.loading.incomeHistory = true;
+    this.error.incomeHistory = false;
+    
+    this.dashboardService.getIncomeHistory().subscribe({
+      next: (data) => {
+        this.incomeHistory = data;
+        this.loading.incomeHistory = false;
+      },
+      error: (err) => {
+        console.error('Error loading income history', err);
+        this.loading.incomeHistory = false;
+        this.error.incomeHistory = true;
+      }
+    });
+  }
+
+  loadTopCustomers(): void {
+    this.loading.topCustomers = true;
+    this.error.topCustomers = false;
+    
+    this.dashboardService.getTopCustomers().subscribe({
+      next: (data) => {
+        this.topCustomers = data;
+        this.loading.topCustomers = false;
+      },
+      error: (err) => {
+        console.error('Error loading top customers', err);
+        this.loading.topCustomers = false;
+        this.error.topCustomers = true;
+      }
+    });
   }
 }

@@ -39,6 +39,14 @@ export class DashboardService {
     return this.http.get<interfaces.Income>(`${this.apiUrl}/income`);
   }
 
+  getIncomeByService(): Observable<interfaces.IncomeByService[]> {
+    return this.http.get<interfaces.IncomeByService[]>(`${this.apiUrl}/income-by-service`);
+  }
+
+  getIncomeHistory(): Observable<interfaces.IncomeHistory[]> {
+    return this.http.get<interfaces.IncomeHistory[]>(`${this.apiUrl}/income-history`);
+  }
+
   getTopCustomers(): Observable<interfaces.TopCustomer[]> {
     return this.http.get<interfaces.TopCustomer[]>(`${this.apiUrl}/top-customers`);
   }

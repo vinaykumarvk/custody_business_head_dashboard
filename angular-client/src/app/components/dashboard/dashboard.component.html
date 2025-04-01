@@ -1,58 +1,219 @@
-
-<div class="bg-custodyBackground min-h-screen font-roboto">
-  <div class="container mx-auto px-4 py-4 w-full">
-    <div *ngIf="error" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4">
-      Error loading dashboard data
-    </div>
-
-    <!-- Customers Section -->
-    <div class="bg-white p-6 rounded-lg shadow-sm mb-6">
-      <h2 class="text-xl font-medium text-custodyBlue mb-5 pb-2 border-b border-gray-200">Customers</h2>
-      
-      <!-- Customer Metrics -->
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-6">
+<div class="dashboard-container">
+  <div class="dashboard-grid">
+    <!-- Customer Metrics Cards -->
+    <div class="metrics-section">
+      <div class="metrics-row">
+        <!-- Total Customers Metric Card -->
         <app-metric-card
-          *ngIf="customerMetrics"
+          *ngIf="!loading.customerMetrics && !error.customerMetrics && customerMetrics"
           title="Total Customers"
-          [value]="formatNumberWithCommas(customerMetrics.totalCustomers)"
-          icon="users"
-          category="customers">
-        </app-metric-card>
+          [value]="customerMetrics.totalCustomers"
+          [changePercent]="customerMetrics.totalCustomersGrowth"
+          icon="user"
+          colorClass="blue"
+        ></app-metric-card>
         
-        <app-metric-card
-          *ngIf="customerMetrics"
-          title="Active Customers"
-          [value]="formatNumberWithCommas(customerMetrics.activeCustomers)"
-          icon="users"
-          subtitle="Monthly active customers"
-          category="customers">
-        </app-metric-card>
-        
-        <app-metric-card
-          *ngIf="customerMetrics"
-          title="New Customers MTD"
-          [value]="formatNumberWithCommas(customerMetrics.newCustomersMTD)"
-          icon="user-plus"
-          [change]="4.7"
-          category="customers">
-        </app-metric-card>
-      </div>
-
-      <!-- Customer Charts -->
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
-        <div class="col-span-2">
-          <app-customer-growth-chart
-            [data]="customerGrowth">
-          </app-customer-growth-chart>
+        <div *ngIf="loading.customerMetrics" class="loading-card">
+          <div class="loading-spinner"></div>
         </div>
-        <div>
-          <app-customer-segments-chart
-            [data]="customerSegments">
-          </app-customer-segments-chart>
+        
+        <div *ngIf="!loading.customerMetrics && error.customerMetrics" class="error-card">
+          <i class="ri-error-warning-line"></i>
+          <span>Error loading data</span>
+        </div>
+        
+        <!-- Active Customers Metric Card -->
+        <app-metric-card
+          *ngIf="!loading.customerMetrics && !error.customerMetrics && customerMetrics"
+          title="Active Customers"
+          [value]="customerMetrics.activeCustomers"
+          [changePercent]="customerMetrics.activeCustomersGrowth"
+          icon="user-check"
+          colorClass="blue"
+        ></app-metric-card>
+        
+        <div *ngIf="loading.customerMetrics" class="loading-card">
+          <div class="loading-spinner"></div>
+        </div>
+        
+        <div *ngIf="!loading.customerMetrics && error.customerMetrics" class="error-card">
+          <i class="ri-error-warning-line"></i>
+          <span>Error loading data</span>
+        </div>
+        
+        <!-- Revenue Metric Card -->
+        <app-metric-card
+          *ngIf="!loading.income && !error.income && income"
+          title="Revenue (USD)"
+          [value]="income.totalIncome"
+          [changePercent]="income.growthRate"
+          icon="line-chart"
+          colorClass="green"
+          valuePrefix="$"
+          valueSuffix="M"
+        ></app-metric-card>
+        
+        <div *ngIf="loading.income" class="loading-card">
+          <div class="loading-spinner"></div>
+        </div>
+        
+        <div *ngIf="!loading.income && error.income" class="error-card">
+          <i class="ri-error-warning-line"></i>
+          <span>Error loading data</span>
+        </div>
+        
+        <!-- AUC Metric Card -->
+        <app-metric-card
+          *ngIf="!loading.aucMetrics && !error.aucMetrics && aucMetrics"
+          title="Total AUC"
+          [value]="aucMetrics.totalAuc"
+          [changePercent]="aucMetrics.growth"
+          icon="funds"
+          colorClass="purple"
+          valuePrefix="$"
+          valueSuffix="B"
+        ></app-metric-card>
+        
+        <div *ngIf="loading.aucMetrics" class="loading-card">
+          <div class="loading-spinner"></div>
+        </div>
+        
+        <div *ngIf="!loading.aucMetrics && error.aucMetrics" class="error-card">
+          <i class="ri-error-warning-line"></i>
+          <span>Error loading data</span>
         </div>
       </div>
     </div>
-
-    <!-- Add Revenue & Assets Section -->
+    
+    <!-- Charts Row 1 -->
+    <div class="charts-row">
+      <!-- Customer Growth Chart -->
+      <div class="chart-card">
+        <app-customer-growth-chart
+          *ngIf="!loading.customerGrowth && !error.customerGrowth && customerGrowth.length > 0"
+          [data]="customerGrowth"
+        ></app-customer-growth-chart>
+        
+        <div *ngIf="loading.customerGrowth" class="loading-chart">
+          <div class="loading-spinner"></div>
+        </div>
+        
+        <div *ngIf="!loading.customerGrowth && error.customerGrowth" class="error-chart">
+          <i class="ri-error-warning-line"></i>
+          <span>Error loading chart data</span>
+        </div>
+      </div>
+      
+      <!-- Customer Segments Chart -->
+      <div class="chart-card">
+        <app-customer-segments-chart
+          *ngIf="!loading.customerSegments && !error.customerSegments && customerSegments.length > 0"
+          [data]="customerSegments"
+        ></app-customer-segments-chart>
+        
+        <div *ngIf="loading.customerSegments" class="loading-chart">
+          <div class="loading-spinner"></div>
+        </div>
+        
+        <div *ngIf="!loading.customerSegments && error.customerSegments" class="error-chart">
+          <i class="ri-error-warning-line"></i>
+          <span>Error loading chart data</span>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Charts Row 2 -->
+    <div class="charts-row">
+      <!-- Trading Volume Chart -->
+      <div class="chart-card">
+        <app-trading-volume-chart
+          *ngIf="!loading.tradingVolume && !error.tradingVolume && tradingVolume.length > 0"
+          [data]="tradingVolume"
+        ></app-trading-volume-chart>
+        
+        <div *ngIf="loading.tradingVolume" class="loading-chart">
+          <div class="loading-spinner"></div>
+        </div>
+        
+        <div *ngIf="!loading.tradingVolume && error.tradingVolume" class="error-chart">
+          <i class="ri-error-warning-line"></i>
+          <span>Error loading chart data</span>
+        </div>
+      </div>
+      
+      <!-- AUC Metrics Chart -->
+      <div class="chart-card">
+        <app-auc-metrics-chart
+          *ngIf="!loading.aucMetrics && !error.aucMetrics && aucMetrics"
+          [data]="aucMetrics"
+        ></app-auc-metrics-chart>
+        
+        <div *ngIf="loading.aucMetrics" class="loading-chart">
+          <div class="loading-spinner"></div>
+        </div>
+        
+        <div *ngIf="!loading.aucMetrics && error.aucMetrics" class="error-chart">
+          <i class="ri-error-warning-line"></i>
+          <span>Error loading chart data</span>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Charts Row 3 -->
+    <div class="charts-row">
+      <!-- Income History Chart -->
+      <div class="chart-card">
+        <app-income-history-chart
+          *ngIf="!loading.incomeHistory && !error.incomeHistory && incomeHistory.length > 0"
+          [data]="incomeHistory"
+        ></app-income-history-chart>
+        
+        <div *ngIf="loading.incomeHistory" class="loading-chart">
+          <div class="loading-spinner"></div>
+        </div>
+        
+        <div *ngIf="!loading.incomeHistory && error.incomeHistory" class="error-chart">
+          <i class="ri-error-warning-line"></i>
+          <span>Error loading chart data</span>
+        </div>
+      </div>
+      
+      <!-- Income by Service Chart -->
+      <div class="chart-card">
+        <app-income-service-chart
+          *ngIf="!loading.incomeByService && !error.incomeByService && incomeByService.length > 0"
+          [data]="incomeByService"
+        ></app-income-service-chart>
+        
+        <div *ngIf="loading.incomeByService" class="loading-chart">
+          <div class="loading-spinner"></div>
+        </div>
+        
+        <div *ngIf="!loading.incomeByService && error.incomeByService" class="error-chart">
+          <i class="ri-error-warning-line"></i>
+          <span>Error loading chart data</span>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Bottom Row - Top Customers -->
+    <div class="charts-row">
+      <!-- Top Customers Table -->
+      <div class="chart-card full-width">
+        <app-top-customers-table
+          *ngIf="!loading.topCustomers && !error.topCustomers && topCustomers.length > 0"
+          [data]="topCustomers"
+        ></app-top-customers-table>
+        
+        <div *ngIf="loading.topCustomers" class="loading-chart">
+          <div class="loading-spinner"></div>
+        </div>
+        
+        <div *ngIf="!loading.topCustomers && error.topCustomers" class="error-chart">
+          <i class="ri-error-warning-line"></i>
+          <span>Error loading table data</span>
+        </div>
+      </div>
+    </div>
   </div>
 </div>

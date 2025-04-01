@@ -1,0 +1,12 @@
+<div class="chart-container">
+  <div class="chart-title">Assets Under Custody Distribution</div>
+  <canvas #chartCanvas></canvas>
+  <div *ngIf="data" class="chart-total">
+    <span class="label">Total AUC:</span>
+    <span class="value">${{data.totalAuc}}B</span>
+    <span *ngIf="data.growth" class="growth" [ngClass]="parseFloat(data.growth) >= 0 ? 'positive' : 'negative'">
+      <i [class]="'ri-arrow-' + (parseFloat(data.growth) >= 0 ? 'up' : 'down') + '-line'"></i>
+      {{parseFloat(data.growth) >= 0 ? '' : '('}}{{Math.abs(parseFloat(data.growth))}}%{{parseFloat(data.growth) >= 0 ? '' : ')'}}
+    </span>
+  </div>
+</div>

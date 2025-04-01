@@ -1,17 +1,17 @@
 import { Component, ElementRef, Input, OnChanges, OnDestroy, SimpleChanges, ViewChild, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import Chart from 'chart.js/auto';
-import { CustomerSegment } from '../../../interfaces/dashboard.interface';
+import { IncomeByService } from '../../../interfaces/dashboard.interface';
 
 @Component({
-  selector: 'app-customer-segments-chart',
+  selector: 'app-income-service-chart',
   standalone: true,
   imports: [CommonModule],
-  templateUrl: './customer-segments-chart.component.html',
-  styleUrls: ['./customer-segments-chart.component.scss']
+  templateUrl: './income-service-chart.component.html',
+  styleUrls: ['./income-service-chart.component.scss']
 })
-export class CustomerSegmentsChartComponent implements OnChanges, OnDestroy, AfterViewInit {
-  @Input() data: CustomerSegment[] = [];
+export class IncomeServiceChartComponent implements OnChanges, OnDestroy, AfterViewInit {
+  @Input() data: IncomeByService[] = [];
   @ViewChild('chartCanvas') chartCanvas!: ElementRef<HTMLCanvasElement>;
   
   chartInstance: Chart | null = null;
@@ -42,27 +42,34 @@ export class CustomerSegmentsChartComponent implements OnChanges, OnDestroy, Aft
     const ctx = this.chartCanvas.nativeElement.getContext('2d');
     if (!ctx) return;
 
-    const labels = this.data.map(segment => segment.segmentName);
-    const percentages = this.data.map(segment => {
-      return typeof segment.percentage === 'string' 
-        ? parseFloat(segment.percentage) 
-        : segment.percentage;
-    });
+    const serviceNames = this.data.map(item => item.serviceName);
+    const amounts = this.data.map(item => 
+      typeof item.amount === 'string' ? parseFloat(item.amount) : item.amount
+    );
+    
+    // Calculate total to get percentages
+    const total = amounts.reduce((sum, amount) => sum + amount, 0);
+    const percentages = amounts.map(amount => ((amount / total) * 100).toFixed(1));
+
+    // Colors for the chart
+    const backgroundColors = [
+      '#2448a5',   // Primary blue
+      '#3e64bc',   // Slightly lighter blue
+      '#5881d4',   // Even lighter blue
+      '#729ded',   // Very light blue
+      '#C6DBFC',   // Lightest blue
+      '#7b7b7b',   // Gray
+    ];
 
     this.chartInstance = new Chart(ctx, {
       type: 'doughnut',
       data: {
-        labels: labels,
+        labels: serviceNames,
         datasets: [{
-          data: percentages,
-          backgroundColor: [
-            '#2448a5',  // Blue
-            '#C6DBFC',  // Light Blue
-            '#7b7b7b',  // Gray
-            '#90CAF9'   // Another shade of blue
-          ],
-          borderWidth: 0,
-          hoverOffset: 4
+          data: amounts,
+          backgroundColor: backgroundColors.slice(0, serviceNames.length),
+          borderWidth: 1,
+          borderColor: '#ffffff'
         }]
       },
       options: {
@@ -80,9 +87,10 @@ export class CustomerSegmentsChartComponent implements OnChanges, OnDestroy, Aft
           tooltip: {
             callbacks: {
               label: (context) => {
+                // Only show percentage, not the amount value
                 const label = context.label || '';
-                const value = context.raw;
-                return `${label}: ${value}%`;
+                const index = context.dataIndex;
+                return `${label}: ${percentages[index]}%`;
               }
             }
           }

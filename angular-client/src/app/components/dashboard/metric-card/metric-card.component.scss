@@ -1,55 +1,13 @@
-.metric-card {
-  border-radius: 8px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-  padding: 16px;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  transition: all 0.3s ease;
-  border-left: 4px solid;
-
-  &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+:host {
+  .text-custodyBlue {
+    color: #2448a5;
   }
 
-  .card-title {
-    font-size: 0.9rem;
-    font-weight: 500;
-    margin-bottom: 5px;
-    display: flex;
-    align-items: center;
-    gap: 5px;
-  }
-
-  .card-value {
-    font-size: 1.8rem;
-    font-weight: 600;
-    margin: 5px 0;
-    line-height: 1.2;
-  }
-
-  .card-subtitle {
-    font-size: 0.85rem;
+  .text-custodyGray {
     color: #7b7b7b;
-    margin-bottom: 5px;
   }
 
-  .card-change {
-    font-size: 0.85rem;
-    font-weight: 500;
-    display: flex;
-    align-items: center;
-    gap: 3px;
-    margin-top: auto;
-    padding-top: 8px;
-
-    &.positive {
-      color: #4caf50;
-    }
-
-    &.negative {
-      color: #f44336;
-    }
+  .bg-custodyLightBlue {
+    background-color: #C6DBFC;
   }
 }
