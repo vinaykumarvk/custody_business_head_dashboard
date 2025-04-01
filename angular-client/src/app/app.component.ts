@@ -7,8 +7,18 @@ import { DashboardComponent } from './components/dashboard/dashboard.component';
   selector: 'app-root',
   standalone: true,
   imports: [RouterOutlet, CommonModule, DashboardComponent],
-  template: `<router-outlet />`,
-  styles: [],
+  template: `
+    <main class="app-container">
+      <router-outlet />
+    </main>
+  `,
+  styles: [`
+    .app-container {
+      padding: 20px;
+      height: 100vh;
+      background-color: #F8FAFC;
+    }
+  `],
 })
 export class AppComponent {
   title = 'Custody Dashboard';
