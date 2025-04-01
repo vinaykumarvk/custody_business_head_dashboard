@@ -1,14 +1,16 @@
 import { ApplicationConfig } from '@angular/core';
 import { provideRouter } from '@angular/router';
+import { provideHttpClient, withFetch } from '@angular/common/http';
 
 import { routes } from './app.routes';
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideRouter(routes),
+    provideHttpClient(withFetch()),
     {
       provide: 'SERVER_URL',
-      useValue: 'http://0.0.0.0:3000'
+      useValue: window.location.origin
     }
   ]
 };
