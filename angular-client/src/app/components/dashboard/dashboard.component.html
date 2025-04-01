@@ -1,0 +1,40 @@
+
+<div class="bg-custodyBackground min-h-screen font-roboto">
+  <div class="container mx-auto px-4 py-4 w-full">
+    <div *ngIf="error" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4">
+      Error loading dashboard data
+    </div>
+
+    <!-- Customers Section -->
+    <div class="bg-white p-6 rounded-lg shadow-sm mb-6">
+      <h2 class="text-xl font-medium text-custodyBlue mb-5 pb-2 border-b border-gray-200">Customers</h2>
+      
+      <!-- Customer Metrics -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-6">
+        <app-metric-card
+          *ngIf="customerMetrics"
+          title="Total Customers"
+          [value]="customerMetrics.totalCustomers"
+          icon="users">
+        </app-metric-card>
+        <!-- Add more metric cards -->
+      </div>
+
+      <!-- Customer Charts -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+        <div class="col-span-2">
+          <app-customer-growth-chart
+            [data]="customerGrowth">
+          </app-customer-growth-chart>
+        </div>
+        <div>
+          <app-customer-segments-chart
+            [data]="customerSegments">
+          </app-customer-segments-chart>
+        </div>
+      </div>
+    </div>
+
+    <!-- Add Revenue & Assets Section -->
+  </div>
+</div>
