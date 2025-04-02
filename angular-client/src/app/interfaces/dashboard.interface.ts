@@ -15,6 +15,7 @@ export interface CustomerGrowth {
   id: number;
   date: Date | string;
   customers: number;
+  newCustomers: number;
   createdAt?: Date;
 }
 

@@ -1,0 +1,65 @@
+<div class="metric-cards">
+  <div class="metric-card">
+    <div class="card-content">
+      <div class="metric-icon">
+        <i class="fas fa-users"></i>
+      </div>
+      <div class="metric-details">
+        <h3>Total Customers</h3>
+        <div class="metric-value">{{ metrics.totalCustomers }}</div>
+      </div>
+    </div>
+    <div class="metric-trend positive">
+      <i class="fas fa-arrow-up"></i>
+      <span>{{ metrics.newCustomersMtd }} new MTD</span>
+    </div>
+  </div>
+
+  <div class="metric-card">
+    <div class="card-content">
+      <div class="metric-icon">
+        <i class="fas fa-chart-line"></i>
+      </div>
+      <div class="metric-details">
+        <h3>Active Customers</h3>
+        <div class="metric-value">{{ metrics.activeCustomers }}</div>
+      </div>
+    </div>
+    <div class="metric-trend positive">
+      <i class="fas fa-arrow-up"></i>
+      <span>{{ metrics.activeCustomersGrowth }}% growth</span>
+    </div>
+  </div>
+
+  <div class="metric-card">
+    <div class="card-content">
+      <div class="metric-icon">
+        <i class="fas fa-handshake"></i>
+      </div>
+      <div class="metric-details">
+        <h3>New Customers</h3>
+        <div class="metric-value">{{ metrics.newCustomersMtd }}</div>
+      </div>
+    </div>
+    <div class="metric-trend positive">
+      <i class="fas fa-arrow-up"></i>
+      <span>{{ metrics.newCustomersGrowth }}% growth</span>
+    </div>
+  </div>
+
+  <div class="metric-card">
+    <div class="card-content">
+      <div class="metric-icon">
+        <i class="fas fa-user-clock"></i>
+      </div>
+      <div class="metric-details">
+        <h3>Inactive Customers</h3>
+        <div class="metric-value">{{ metrics.inactiveCustomers }}</div>
+      </div>
+    </div>
+    <div class="metric-trend negative">
+      <i class="fas fa-arrow-down"></i>
+      <span>{{ metrics.inactiveCustomersGrowth }}% change</span>
+    </div>
+  </div>
+</div> 
