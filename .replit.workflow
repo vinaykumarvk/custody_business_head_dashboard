@@ -1,4 +1,4 @@
-run = ["bash", "start_both.sh"]
+run = ["bash", "workflow.sh"]
 hidden = ["node_modules", ".config"]
 onBoot = []
 deploymentTarget = "cloudrun"

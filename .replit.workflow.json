@@ -1,18 +1,10 @@
 {
-  "workflows": [
-    {
-      "name": "Server",
-      "command": "./start_server.sh",
-      "timeout": 30000,
-      "restartable": true,
-      "restartOnFiles": ["server/**/*"]
-    },
-    {
-      "name": "Angular Client",
-      "command": "./start_angular.sh",
-      "timeout": 30000,
-      "restartable": true,
-      "restartOnFiles": ["angular-client/**/*"]
-    }
-  ]
+  "runnable": true,
+  "name": "Start Server",
+  "id": "start-server",
+  "description": "Starts the Express server for the Custody Dashboard API",
+  "language": "nodejs",
+  "icon": "nodejs",
+  "run": ["bash", "workflow.sh"],
+  "environment": {}
 }
