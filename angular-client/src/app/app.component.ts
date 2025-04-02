@@ -10,7 +10,6 @@ import { DashboardComponent } from './components/dashboard/dashboard.component';
   template: `
     <main class="app-container">
       <h1 class="dashboard-title">{{title}}</h1>
-      <app-dashboard></app-dashboard>
       <router-outlet />
     </main>
   `,

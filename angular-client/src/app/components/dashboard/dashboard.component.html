@@ -67,7 +67,7 @@
           *ngIf="!loading.aucMetrics && !error.aucMetrics && aucMetrics"
           title="Total AUC"
           [value]="aucMetrics.totalAuc"
-          [changePercent]="aucMetrics.growth"
+          [change]="aucMetrics.growth"
           icon="funds"
           colorClass="purple"
           valuePrefix="$"
