@@ -1,25 +1,8 @@
 {
-  "workflows": [
-    {
-      "name": "Express Server",
-      "shellCommands": ["./start_server.sh"],
-      "terminal": true,
-      "closeExistingTerminals": true,
-      "startIn": "current"
-    },
-    {
-      "name": "Angular Client",
-      "shellCommands": ["./start_angular.sh"],
-      "terminal": true,
-      "closeExistingTerminals": false,
-      "startIn": "current"
-    },
-    {
-      "name": "Full Application",
-      "shellCommands": ["./start_both.sh"],
-      "terminal": true,
-      "closeExistingTerminals": true,
-      "startIn": "current"
+  "workflows": {
+    "Start Custody Dashboard": {
+      "run": "./start_both.sh",
+      "persistent": true
     }
-  ]
+  }
 }
