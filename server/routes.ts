@@ -3,8 +3,30 @@ import { createServer, type Server } from "http";
 import { db } from "./db";
 import { storage } from "./storage";
 import { customerGrowth } from "@shared/schema";
+import path from "path";
+import fs from "fs";
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Root path - serve the landing page
+  app.get("/", (_req, res) => {
+    const indexPath = path.join(process.cwd(), "index.html");
+    if (fs.existsSync(indexPath)) {
+      res.sendFile(indexPath);
+    } else {
+      res.send("Welcome to the Custody Dashboard Application");
+    }
+  });
+  
+  // Redirect to Angular app
+  app.get("/api/angular", (_req, res) => {
+    res.redirect("http://localhost:4200");
+  });
+  
+  // Redirect to React app
+  app.get("/api/react", (_req, res) => {
+    res.redirect("http://localhost:3000");
+  });
+  
   // Dashboard data endpoints
   
   // Customer Metrics endpoint
@@ -272,7 +294,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Generate new data with proper data integrity
       const now = new Date();
       let baseTotal = 8000; // Starting total for first month
-      const months = [];
+      
+      interface MonthData {
+        date: Date;
+        newCustomers: number;
+        totalCustomers: number;
+      }
+      
+      const months: MonthData[] = [];
       
       // First, prepare the data with accurate calculations
       for (let i = 0; i < 30; i++) {

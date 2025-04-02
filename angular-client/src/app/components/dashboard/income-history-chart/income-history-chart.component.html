@@ -1,0 +1,14 @@
+<div class="chart-container">
+  <div class="chart-header">
+    <div class="chart-title">Income History</div>
+    <div class="time-range-selector">
+      <button *ngFor="let range of timeRanges" 
+              class="time-range-button" 
+              [class.active]="selectedTimeRange === range"
+              (click)="setTimeRange(range)">
+        {{ range }}
+      </button>
+    </div>
+  </div>
+  <canvas #chartCanvas></canvas>
+</div>

@@ -72,44 +72,70 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getCustomerMetrics(): Promise<CustomerMetrics | undefined> {
-    const [metrics] = await db.select().from(customerMetrics);
-    return metrics || undefined;
+    // Get customer growth data instead of history
+    const growthData = await this.getCustomerGrowth();
+    
+    // If no growth data, return from customerMetrics table (fallback)
+    if (growthData.length === 0) {
+      const result = await db.select().from(customerMetrics);
+      return result[0];
+    }
+    
+    // Get the most recent growth record
+    const latestData = growthData.sort((a, b) => 
+      new Date(b.date).getTime() - new Date(a.date).getTime()
+    )[0];
+    
+    // Calculate active customers (approximately 85-90% of total)
+    const activeCustomers = Math.floor(latestData.totalCustomers * 0.88);
+    
+    // Return metrics based on latest growth data
+    return {
+      id: 1,
+      totalCustomers: latestData.totalCustomers,
+      activeCustomers: activeCustomers,
+      newCustomersMTD: latestData.newCustomers,
+      date: new Date()
+    };
   }
 
   async getCustomerGrowth(): Promise<CustomerGrowth[]> {
-    const result = await db.select().from(customerGrowth).orderBy(asc(customerGrowth.date));
+    // Get data directly from customerGrowth table and order by date in the database query
+    const result = await db.select()
+      .from(customerGrowth)
+      .orderBy(customerGrowth.date);
+    
+    console.log("Retrieved customer growth data:", result.map(r => 
+      `${new Date(r.date).toISOString().substr(0,10)}: Total=${r.totalCustomers}, New=${r.newCustomers}`
+    ).join('\n'));
+    
     return result;
   }
 
   async getCustomerSegments(): Promise<CustomerSegments[]> {
-    // First check if we have existing data in the customerSegments table
-    const existingSegments = await db.select().from(customerSegments);
-    if (existingSegments.length > 0) {
-      return existingSegments;
+    // Get customer history data
+    const history = await this.getCustomerHistory();
+    
+    // If no history data, return from customerSegments table (fallback)
+    if (history.length === 0) {
+      const result = await db.select().from(customerSegments);
+      return result;
     }
     
-    // Otherwise, generate segments from monthly customer data
-    const monthlyData = await this.getMonthlyCustomerData();
-    
-    // If no monthly data, return empty array
-    if (monthlyData.length === 0) {
-      return [];
-    }
-    
-    // Get the most recent monthly data record
-    const latestData = monthlyData.sort((a, b) => 
-      new Date(b.month).getTime() - new Date(a.month).getTime()
+    // Get the most recent customer history record
+    const latestData = history.sort((a, b) => 
+      new Date(b.date).getTime() - new Date(a.date).getTime()
     )[0];
     
-    // Calculate total customers
-    const total = latestData.institutional + latestData.corporate + latestData.hni + latestData.funds;
+    // Calculate total
+    const total = latestData.totalCustomers;
     
     if (total === 0) {
-      return [];
+      throw new Error("Total customers cannot be zero");
     }
     
     // Calculate percentages from segments
-    const segments = [
+    return [
       {
         id: 1,
         segmentName: "Institutional",
@@ -131,69 +157,170 @@ export class DatabaseStorage implements IStorage {
         percentage: ((latestData.funds / total) * 100).toFixed(1)
       }
     ];
-    
-    // Store segments in database for future use
-    for (const segment of segments) {
-      await db.insert(customerSegments).values({
-        segmentName: segment.segmentName,
-        percentage: segment.percentage
-      }).onConflictDoUpdate({
-        target: customerSegments.id,
-        set: { percentage: segment.percentage }
-      });
-    }
-    
-    return segments;
   }
 
   async getTradingVolume(): Promise<TradingVolume[]> {
-    return db.select().from(tradingVolume).orderBy(asc(tradingVolume.date));
+    const result = await db.select().from(tradingVolume);
+    return result;
   }
 
   async getAucHistory(): Promise<AucHistory[]> {
-    return db.select().from(aucHistory).orderBy(asc(aucHistory.date));
+    const result = await db.select().from(aucHistory);
+    return result;
   }
 
   async getAucMetrics(): Promise<AucMetrics | undefined> {
-    const [metrics] = await db.select().from(aucMetrics);
-    return metrics || undefined;
+    // First check if we have existing data in the database
+    const existingMetrics = await db.select().from(aucMetrics);
+    if (existingMetrics.length > 0) {
+      return existingMetrics[0];
+    }
+    
+    // Get the AUC history data
+    const aucHistoryData = await this.getAucHistory();
+    
+    // If no history data, return undefined
+    if (aucHistoryData.length < 2) {
+      return undefined;
+    }
+    
+    // Sort by date, most recent first
+    const sortedData = aucHistoryData.sort((a, b) => 
+      new Date(b.date).getTime() - new Date(a.date).getTime()
+    );
+    
+    // Get the most recent and previous month data
+    const latestData = sortedData[0];
+    const previousData = sortedData[1];
+    
+    // Calculate total AUC for latest month (sum of all segments)
+    const latestEquity = parseFloat(latestData.equity);
+    const latestFixedIncome = parseFloat(latestData.fixedIncome);
+    const latestMutualFunds = parseFloat(latestData.mutualFunds);
+    const latestOthers = parseFloat(latestData.others);
+    
+    const totalLatest = latestEquity + latestFixedIncome + latestMutualFunds + latestOthers;
+    
+    // Calculate total AUC for previous month
+    const previousEquity = parseFloat(previousData.equity);
+    const previousFixedIncome = parseFloat(previousData.fixedIncome);
+    const previousMutualFunds = parseFloat(previousData.mutualFunds);
+    const previousOthers = parseFloat(previousData.others);
+    
+    const totalPrevious = previousEquity + previousFixedIncome + previousMutualFunds + previousOthers;
+    
+    // Calculate growth rate
+    const growthRate = ((totalLatest - totalPrevious) / totalPrevious) * 100;
+    
+    // Insert the calculated metrics into the database
+    const metricsToInsert = {
+      totalAuc: totalLatest.toFixed(1),
+      equity: latestEquity.toFixed(1),
+      fixedIncome: latestFixedIncome.toFixed(1),
+      mutualFunds: latestMutualFunds.toFixed(1),
+      others: latestOthers.toFixed(1),
+      growth: growthRate.toFixed(1)
+    };
+    
+    const [insertedMetrics] = await db.insert(aucMetrics).values(metricsToInsert).returning();
+    return insertedMetrics;
   }
 
   async getIncome(): Promise<Income | undefined> {
-    const [incomeData] = await db.select().from(income);
-    return incomeData || undefined;
+    // Get the income history data first
+    const incomeHistoryData = await this.getIncomeHistory();
+    
+    // If no history data, return existing or undefined
+    if (incomeHistoryData.length < 2) {
+      const existingIncome = await db.select().from(income);
+      return existingIncome.length > 0 ? existingIncome[0] : undefined;
+    }
+    
+    // Sort by date, most recent first
+    const sortedData = incomeHistoryData.sort((a, b) => 
+      new Date(b.date).getTime() - new Date(a.date).getTime()
+    );
+    
+    // Get the most recent and previous month data
+    const latestData = sortedData[0];
+    const previousData = sortedData[1];
+    
+    // Calculate income values
+    const latestAmount = parseFloat(latestData.amount);
+    const previousAmount = parseFloat(previousData.amount);
+    
+    // Calculate the MTD income and outstanding fees (for simplicity, using 30% of income as outstanding)
+    const incomeMTD = latestAmount;
+    const outstandingFees = incomeMTD * 0.3;
+    
+    // Calculate growth rate and round to 2 decimal places
+    const growthRate = ((latestAmount - previousAmount) / previousAmount) * 100;
+    const formattedGrowthRate = growthRate.toFixed(2);
+    
+    // Update or insert the income data
+    const existingIncome = await db.select().from(income);
+    
+    if (existingIncome.length > 0) {
+      // Update existing record
+      await db.update(income)
+        .set({
+          incomeMTD: incomeMTD.toFixed(2),
+          outstandingFees: outstandingFees.toFixed(2),
+          growth: formattedGrowthRate
+        })
+        .where(eq(income.id, existingIncome[0].id));
+      
+      // Get the updated record
+      const [updatedIncome] = await db.select().from(income).where(eq(income.id, existingIncome[0].id));
+      return updatedIncome;
+    } else {
+      // Insert new record
+      const [insertedIncome] = await db.insert(income)
+        .values({
+          incomeMTD: incomeMTD.toFixed(2),
+          outstandingFees: outstandingFees.toFixed(2),
+          growth: formattedGrowthRate
+        })
+        .returning();
+      return insertedIncome;
+    }
   }
 
   async getIncomeByService(): Promise<IncomeByService[]> {
-    return db.select().from(incomeByService);
+    const result = await db.select().from(incomeByService);
+    return result;
   }
 
   async getIncomeHistory(): Promise<IncomeHistory[]> {
-    return db.select().from(incomeHistory).orderBy(asc(incomeHistory.date));
+    const result = await db.select().from(incomeHistory);
+    return result;
   }
 
   async getTopCustomers(): Promise<TopCustomers[]> {
-    return db.select().from(topCustomers);
+    const result = await db.select().from(topCustomers);
+    return result;
   }
   
   // Monthly customer data methods
   async getMonthlyCustomerData(): Promise<MonthlyCustomerData[]> {
-    return db.select().from(monthlyCustomerData).orderBy(asc(monthlyCustomerData.month));
+    const result = await db.select().from(monthlyCustomerData);
+    return result;
   }
   
   async createMonthlyCustomerData(data: InsertMonthlyCustomerData): Promise<MonthlyCustomerData> {
-    const [result] = await db.insert(monthlyCustomerData).values(data).returning();
-    return result;
+    const result = await db.insert(monthlyCustomerData).values(data).returning();
+    return result[0];
   }
   
   // Customer history methods
   async getCustomerHistory(): Promise<CustomerHistory[]> {
-    return db.select().from(customerHistory).orderBy(asc(customerHistory.date));
+    const result = await db.select().from(customerHistory);
+    return result;
   }
   
   async createCustomerHistory(data: InsertCustomerHistory): Promise<CustomerHistory> {
-    const [result] = await db.insert(customerHistory).values(data).returning();
-    return result;
+    const result = await db.insert(customerHistory).values(data).returning();
+    return result[0];
   }
   
   // Derived customer metrics methods

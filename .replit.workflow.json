@@ -1,0 +1,5 @@
+{
+  "name": "Custody Dashboard",
+  "language": "bash",
+  "entrypoint": "workflow.sh"
+}

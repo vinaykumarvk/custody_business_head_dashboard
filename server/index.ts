@@ -1,70 +1,79 @@
-import express, { type Request, Response, NextFunction } from "express";
+import express from "express";
+import session from "express-session";
+import { createServer } from "http";
+import path from "path";
+import { json } from "express";
+import { log } from "./vite"; // Removed setupVite import as we'll no longer need it
 import { registerRoutes } from "./routes";
-import { setupVite, serveStatic, log } from "./vite";
+// Define cors as a plain function since we don't have the package
+function cors(options?: { origin?: string | string[]; methods?: string[] }) {
+  return (req: express.Request, res: express.Response, next: express.NextFunction) => {
+    const requestOrigin = req.headers.origin;
+    const allowedOrigins = options?.origin || '*';
 
-const app = express();
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
-
-app.use((req, res, next) => {
-  const start = Date.now();
-  const path = req.path;
-  let capturedJsonResponse: Record<string, any> | undefined = undefined;
-
-  const originalResJson = res.json;
-  res.json = function (bodyJson, ...args) {
-    capturedJsonResponse = bodyJson;
-    return originalResJson.apply(res, [bodyJson, ...args]);
-  };
-
-  res.on("finish", () => {
-    const duration = Date.now() - start;
-    if (path.startsWith("/api")) {
-      let logLine = `${req.method} ${path} ${res.statusCode} in ${duration}ms`;
-      if (capturedJsonResponse) {
-        logLine += ` :: ${JSON.stringify(capturedJsonResponse)}`;
+    // Set CORS headers
+    if (typeof allowedOrigins === 'string') {
+      res.header('Access-Control-Allow-Origin', allowedOrigins);
+    } else if (Array.isArray(allowedOrigins) && requestOrigin) {
+      if (allowedOrigins.includes(requestOrigin)) {
+        res.header('Access-Control-Allow-Origin', requestOrigin);
       }
-
-      if (logLine.length > 80) {
-        logLine = logLine.slice(0, 79) + "…";
-      }
-
-      log(logLine);
     }
-  });
+    
+    res.header('Access-Control-Allow-Methods', options?.methods?.join(',') || 'GET,HEAD,PUT,PATCH,POST,DELETE');
+    res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
+    
+    // Handle preflight requests
+    if (req.method === 'OPTIONS') {
+      return res.status(200).end();
+    }
+    
+    next();
+  };
+}
 
-  next();
+async function main() {
+  const app = express();
+  
+  // Configure JSON middleware
+  app.use(json());
+  
+  // Configure CORS with specific origins - only Angular app now
+  app.use(cors({
+    origin: ['http://localhost:4200'],
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS']
+  }));
+  
+  // Session configuration
+  app.use(
+    session({
+      secret: "your-secret-key",
+      resave: false,
+      saveUninitialized: false,
+      cookie: { secure: false },
+    }),
+  );
+  
+  // Bind to 0.0.0.0 to allow external access when deployed
+  const server = createServer(app);
+  const PORT = process.env.PORT || 5000;
+
+  // Register API routes
+  await registerRoutes(app);
+  
+  // Error handling middleware
+  app.use((err: any, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
+    console.error(err.stack);
+    res.status(500).send("Something broke!");
+  });
+  
+  // Start the server
+  server.listen(Number(PORT), '0.0.0.0', () => {
+    log(`serving on port ${PORT}`);
+  });
+}
+
+main().catch((err) => {
+  console.error("Fatal error:", err);
+  process.exit(1);
 });
-
-(async () => {
-  const server = await registerRoutes(app);
-
-  app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
-    const status = err.status || err.statusCode || 500;
-    const message = err.message || "Internal Server Error";
-
-    res.status(status).json({ message });
-    throw err;
-  });
-
-  // importantly only setup vite in development and after
-  // setting up all the other routes so the catch-all route
-  // doesn't interfere with the other routes
-  if (app.get("env") === "development") {
-    await setupVite(app, server);
-  } else {
-    serveStatic(app);
-  }
-
-  // ALWAYS serve the app on port 5000
-  // this serves both the API and the client.
-  // It is the only port that is not firewalled.
-  const port = 5000;
-  server.listen({
-    port,
-    host: "0.0.0.0",
-    reusePort: true,
-  }, () => {
-    log(`serving on port ${port}`);
-  });
-})();

@@ -1,0 +1,53 @@
+.chart-container {
+  height: 300px;
+  width: 100%;
+  position: relative;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  padding: 16px;
+  margin-bottom: 20px;
+}
+
+.chart-title {
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: #2448a5;
+  margin-bottom: 15px;
+}
+
+.chart-total {
+  position: absolute;
+  left: 24px;
+  bottom: 24px;
+  display: flex;
+  align-items: center;
+  font-size: 0.9rem;
+  gap: 8px;
+  
+  .label {
+    color: #7b7b7b;
+  }
+  
+  .value {
+    font-weight: 500;
+    color: #2448a5;
+  }
+  
+  .growth {
+    display: flex;
+    align-items: center;
+    
+    &.positive {
+      color: #4caf50;
+    }
+    
+    &.negative {
+      color: #f44336;
+    }
+    
+    i {
+      margin-right: 2px;
+    }
+  }
+}
