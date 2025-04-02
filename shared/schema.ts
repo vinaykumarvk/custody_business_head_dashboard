@@ -1,10 +1,10 @@
-import { pgTable, text, integer, numeric, timestamp, boolean, serial, pgEnum } from "drizzle-orm/pg-core";
+import { pgTable, text, integer, numeric, timestamp, boolean } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
 // User schema
 export const users = pgTable("users", {
-  id: serial("id").primaryKey(),
+  id: integer("id").primaryKey().notNull(),
   username: text("username").notNull().unique(),
   password: text("password").notNull(),
 });
@@ -19,7 +19,7 @@ export type User = typeof users.$inferSelect;
 
 // Customer metrics schema
 export const customerMetrics = pgTable("customer_metrics", {
-  id: serial("id").primaryKey(),
+  id: integer("id").primaryKey().notNull(),
   totalCustomers: integer("total_customers").notNull(),
   activeCustomers: integer("active_customers").notNull(),
   newCustomersMTD: integer("new_customers_mtd").notNull(),
@@ -35,7 +35,7 @@ export type CustomerMetrics = typeof customerMetrics.$inferSelect;
 
 // Customer Growth schema
 export const customerGrowth = pgTable("customer_growth", {
-  id: serial("id").primaryKey(),
+  id: integer("id").primaryKey().notNull(),
   date: timestamp("date").notNull(),
   totalCustomers: integer("total_customers").notNull(),
   newCustomers: integer("new_customers").notNull(),
@@ -50,7 +50,7 @@ export type CustomerGrowth = typeof customerGrowth.$inferSelect;
 
 // Customer Segments schema
 export const customerSegments = pgTable("customer_segments", {
-  id: serial("id").primaryKey(),
+  id: integer("id").primaryKey().notNull(),
   segmentName: text("segment_name").notNull(),
   percentage: numeric("percentage").notNull(),
 });
@@ -64,7 +64,7 @@ export type CustomerSegments = typeof customerSegments.$inferSelect;
 
 // Trading Volume schema
 export const tradingVolume = pgTable("trading_volume", {
-  id: serial("id").primaryKey(),
+  id: integer("id").primaryKey().notNull(),
   date: timestamp("date").notNull(),
   volume: numeric("volume").notNull(),
 });
@@ -78,7 +78,7 @@ export type TradingVolume = typeof tradingVolume.$inferSelect;
 
 // AUC History schema
 export const aucHistory = pgTable("auc_history", {
-  id: serial("id").primaryKey(),
+  id: integer("id").primaryKey().notNull(),
   date: timestamp("date").notNull(),
   equity: numeric("equity").notNull(),
   fixedIncome: numeric("fixed_income").notNull(),
@@ -95,7 +95,7 @@ export type AucHistory = typeof aucHistory.$inferSelect;
 
 // AUC Metrics schema
 export const aucMetrics = pgTable("auc_metrics", {
-  id: serial("id").primaryKey(),
+  id: integer("id").primaryKey().notNull(),
   totalAuc: numeric("total_auc").notNull(),
   equity: numeric("equity").notNull(),
   fixedIncome: numeric("fixed_income").notNull(),
@@ -113,7 +113,7 @@ export type AucMetrics = typeof aucMetrics.$inferSelect;
 
 // Income schema
 export const income = pgTable("income", {
-  id: serial("id").primaryKey(),
+  id: integer("id").primaryKey().notNull(),
   incomeMTD: numeric("income_mtd").notNull(),
   outstandingFees: numeric("outstanding_fees").notNull(),
   growth: numeric("growth"),  // Growth percentage
@@ -128,7 +128,7 @@ export type Income = typeof income.$inferSelect;
 
 // Income by Service schema
 export const incomeByService = pgTable("income_by_service", {
-  id: serial("id").primaryKey(),
+  id: integer("id").primaryKey().notNull(),
   serviceName: text("service_name").notNull(),
   amount: numeric("amount").notNull(),
 });
@@ -142,7 +142,7 @@ export type IncomeByService = typeof incomeByService.$inferSelect;
 
 // Income History schema
 export const incomeHistory = pgTable("income_history", {
-  id: serial("id").primaryKey(),
+  id: integer("id").primaryKey().notNull(),
   date: timestamp("date").notNull(),
   amount: numeric("amount").notNull(),
 });
@@ -156,7 +156,7 @@ export type IncomeHistory = typeof incomeHistory.$inferSelect;
 
 // Top Revenue Customers schema
 export const topCustomers = pgTable("top_customers", {
-  id: serial("id").primaryKey(),
+  id: integer("id").primaryKey().notNull(),
   name: text("name").notNull(),
   customerType: text("customer_type").notNull(),
   revenue: numeric("revenue").notNull(),
@@ -173,7 +173,7 @@ export type TopCustomers = typeof topCustomers.$inferSelect;
 
 // Monthly Customer Data schema - tracks customer segments by month
 export const monthlyCustomerData = pgTable("monthly_customer_data", {
-  id: serial("id").primaryKey(),
+  id: integer("id").primaryKey().notNull(),
   month: timestamp("month").notNull(),
   institutional: integer("institutional").notNull(),
   corporate: integer("corporate").notNull(),
@@ -191,7 +191,7 @@ export type MonthlyCustomerData = typeof monthlyCustomerData.$inferSelect;
 
 // Customer History schema
 export const customerHistory = pgTable("customer_history", {
-  id: serial("id").primaryKey(),
+  id: integer("id").primaryKey().notNull(),
   date: timestamp("date").notNull(),
   // Original fields
   totalCustomers: integer("total_customers").notNull(),

@@ -1,11 +1,6 @@
 {
-  "workflow": {
-    "terminal": {
-      "Start Developer Environment": {
-        "cmd": "./start_both.sh",
-        "persistent": true,
-        "restart": true
-      }
-    }
-  }
+  "name": "Start Angular Dashboard",
+  "language": "nodejs",
+  "run": "./start_angular_only.sh",
+  "persistentSessions": true
 }

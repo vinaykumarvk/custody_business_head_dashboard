@@ -1,18 +1,16 @@
 #!/bin/bash
 
 # Start the Express server
-cd server && npx tsx index.ts &
+./start_server.sh &
 SERVER_PID=$!
-echo "Server started with PID: $SERVER_PID"
-sleep 3
 
-# Start the Angular app
-cd angular-client && npx ng serve --port 4200 --host 0.0.0.0 &
+# Wait briefly for server to initialize
+sleep 2
+
+# Start the Angular client
+./start_angular.sh &
 ANGULAR_PID=$!
-echo "Angular app started with PID: $ANGULAR_PID"
 
-# Wait for any process to exit
-wait -n
-
-# Exit with status of process that exited first
-exit $?
+# Wait for both processes to complete
+wait $SERVER_PID
+wait $ANGULAR_PID

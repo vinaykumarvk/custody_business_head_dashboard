@@ -3,7 +3,7 @@ import session from "express-session";
 import { createServer } from "http";
 import path from "path";
 import { json } from "express";
-import { log, setupVite } from "./vite";
+import { log } from "./vite"; // Removed setupVite import as we'll no longer need it
 import { registerRoutes } from "./routes";
 // Define cors as a plain function since we don't have the package
 function cors(options?: { origin?: string | string[]; methods?: string[] }) {
@@ -38,9 +38,9 @@ async function main() {
   // Configure JSON middleware
   app.use(json());
   
-  // Configure CORS with specific origins
+  // Configure CORS with specific origins - only Angular app now
   app.use(cors({
-    origin: ['http://localhost:4200', 'http://localhost:3000'],
+    origin: ['http://localhost:4200'],
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS']
   }));
   
@@ -60,9 +60,6 @@ async function main() {
 
   // Register API routes
   await registerRoutes(app);
-  
-  // Setup Vite or static file serving
-  await setupVite(app, server);
   
   // Error handling middleware
   app.use((err: any, _req: express.Request, res: express.Response, _next: express.NextFunction) => {

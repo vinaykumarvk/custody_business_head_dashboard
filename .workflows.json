@@ -1,12 +1,25 @@
 {
-  "workflows": {
-    "server": {
+  "workflows": [
+    {
       "name": "Express Server",
-      "run": "cd server && npx tsx index.ts"
+      "shellCommands": ["./start_server.sh"],
+      "terminal": true,
+      "closeExistingTerminals": true,
+      "startIn": "current"
     },
-    "angular": {
+    {
       "name": "Angular Client",
-      "run": "cd angular-client && npx ng serve --port 4200 --host 0.0.0.0 --disable-host-check"
+      "shellCommands": ["./start_angular.sh"],
+      "terminal": true,
+      "closeExistingTerminals": false,
+      "startIn": "current"
+    },
+    {
+      "name": "Full Application",
+      "shellCommands": ["./start_both.sh"],
+      "terminal": true,
+      "closeExistingTerminals": true,
+      "startIn": "current"
     }
-  }
+  ]
 }

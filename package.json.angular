@@ -1,0 +1,12 @@
+{
+  "name": "custody-business-head-dashboard-angular",
+  "version": "1.0.0",
+  "description": "Custody Business Head Dashboard (Angular Version)",
+  "scripts": {
+    "start": "npx tsx server/index.ts.angular",
+    "db:push": "drizzle-kit push:pg --config=drizzle.config.ts",
+    "dev:server": "npx tsx server/index.ts.angular",
+    "dev:client": "cd angular-client && npm start",
+    "dev": "./start_angular_only.sh"
+  }
+}
