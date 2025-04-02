@@ -1,8 +1,18 @@
 {
-  "workflows": {
-    "Start Custody Dashboard": {
-      "run": "./start_both.sh",
-      "persistent": true
+  "workflows": [
+    {
+      "id": "server",
+      "name": "Server",
+      "command": "./start_server.sh",
+      "timeout": 30000,
+      "restartable": true
+    },
+    {
+      "id": "angular",
+      "name": "Angular Client",
+      "command": "./start_angular.sh",
+      "timeout": 30000,
+      "restartable": true
     }
-  }
+  ]
 }

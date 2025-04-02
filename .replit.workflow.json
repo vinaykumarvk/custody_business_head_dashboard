@@ -1,6 +1,18 @@
 {
-  "name": "Start Angular Dashboard",
-  "language": "nodejs",
-  "run": "./start_angular_only.sh",
-  "persistentSessions": true
+  "workflows": [
+    {
+      "name": "Server",
+      "command": "./start_server.sh",
+      "timeout": 30000,
+      "restartable": true,
+      "restartOnFiles": ["server/**/*"]
+    },
+    {
+      "name": "Angular Client",
+      "command": "./start_angular.sh",
+      "timeout": 30000,
+      "restartable": true,
+      "restartOnFiles": ["angular-client/**/*"]
+    }
+  ]
 }

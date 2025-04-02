@@ -1,16 +1,11 @@
 #!/bin/bash
-
-# Start the Express server
-./start_server.sh &
+# Start server in background
+cd server && npx tsx index.angular.ts &
 SERVER_PID=$!
+echo $SERVER_PID > server-pid.txt
 
-# Wait briefly for server to initialize
-sleep 2
+# Wait a bit for server to start
+sleep 5
 
-# Start the Angular client
-./start_angular.sh &
-ANGULAR_PID=$!
-
-# Wait for both processes to complete
-wait $SERVER_PID
-wait $ANGULAR_PID
+# Start Angular client in foreground
+cd ../angular-client && npx ng serve --host=0.0.0.0 --disable-host-check --port=4200
