@@ -1,10 +1,5 @@
 {
-  "runnable": true,
-  "name": "Start Server",
-  "id": "start-server",
-  "description": "Starts the Express server for the Custody Dashboard API",
-  "language": "nodejs",
-  "icon": "nodejs",
-  "run": ["bash", "workflow.sh"],
-  "environment": {}
+  "name": "Custody Dashboard",
+  "language": "bash",
+  "entrypoint": "workflow.sh"
 }

@@ -5,5 +5,12 @@
     "entrypoint": "server.mjs",
     "onBoot": "./start_api_server.sh",
     "hidden": false
+  },
+  "Custody Dashboard": {
+    "run": "./workflow.sh",
+    "language": "bash",
+    "entrypoint": "workflow.sh",
+    "onBoot": false,
+    "hidden": false
   }
 }

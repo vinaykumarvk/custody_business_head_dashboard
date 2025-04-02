@@ -12,7 +12,7 @@ touch angular_debug.log
 cd "$(dirname "$0")/angular-client"
 
 # Start Angular application
-npx ng serve --host=0.0.0.0 --disable-host-check --port=4200 > ../angular_debug.log 2>&1 &
+npx ng serve --host=0.0.0.0 --disable-host-check --port=4200 --proxy-config proxy.conf.json > ../angular_debug.log 2>&1 &
 ANGULAR_PID=$!
 echo $ANGULAR_PID > ../angular-pid.txt
 
