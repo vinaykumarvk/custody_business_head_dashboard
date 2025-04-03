@@ -150,12 +150,12 @@
           <span>Error loading data</span>
         </div>
         
-        <!-- Income YTD Metric Card -->
+        <!-- Income MTD Metric Card -->
         <app-metric-card
           *ngIf="!loading.income && !error.income && income"
-          title="Income (YTD)"
-          [value]="income.totalIncome"
-          [change]="income.growthRate"
+          title="Income (MTD)"
+          [value]="income.incomeMtd"
+          [change]="income.growth"
           icon="line-chart"
           colorClass="green"
           valuePrefix="$"
@@ -171,16 +171,16 @@
           <span>Error loading data</span>
         </div>
         
-        <!-- Adjusted Outstanding Fees Metric Card -->
+        <!-- Outstanding Fees Metric Card -->
         <app-metric-card
           *ngIf="!loading.income && !error.income && income"
           title="Outstanding Fees"
-          [value]="income.totalIncome"
-          [change]="income.growthRate"
+          [value]="income.outstandingFees"
+          [change]="income.growth"
           icon="funds-box"
           colorClass="orange"
           valuePrefix="$"
-          valueSuffix="K"
+          valueSuffix="M"
         ></app-metric-card>
         
         <div *ngIf="loading.income" class="loading-card">

@@ -2,12 +2,12 @@
   <div class="blue-edge"></div>
   <div class="card-content">
     <h3 class="card-title">{{title}}</h3>
-    <p class="card-value">{{value}}</p>
+    <p class="card-value">{{valuePrefix}}{{value | number:'1.1-2'}}{{valueSuffix}}</p>
     <p *ngIf="subtitle" class="card-subtitle">{{subtitle}}</p>
-    <div *ngIf="displayChange !== undefined" class="change-container">
+    <div *ngIf="change !== undefined" class="change-container">
       <span class="change-value" [class.positive]="isPositive" [class.negative]="!isPositive">
         <i [class]="'ri-arrow-' + (isPositive ? 'up' : 'down') + '-line'"></i>
-        {{isPositive ? '' : '('}}{{Math.abs(displayChange)}}%{{isPositive ? '' : ')'}}
+        {{isPositive ? '' : '('}}{{Math.abs(change)}}%{{isPositive ? '' : ')'}}
       </span>
       <span class="change-period">vs last month</span>
     </div>

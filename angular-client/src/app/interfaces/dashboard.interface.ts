@@ -58,11 +58,9 @@ export interface AucMetrics {
 // Income interface
 export interface Income {
   id: number;
-  totalIncome: number;
-  feesIncome: number;
-  tradingIncome: number;
-  otherIncome: number;
-  growthRate: number;
+  incomeMtd: number;
+  outstandingFees: number;
+  growth: number;
   createdAt?: Date;
 }
 

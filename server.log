@@ -1,1 +1,6 @@
-Port 5000 is already in use. Please try a different port or kill the existing process.
+Server running on port 5000
+Available at http://127.0.0.1:5000
+Successfully connected to database
+Fetching income history data...
+Retrieved 12 income history records
+Sample income history record: { id: 36, date: 2025-02-28T18:30:00.000Z, amount: '8.89' }

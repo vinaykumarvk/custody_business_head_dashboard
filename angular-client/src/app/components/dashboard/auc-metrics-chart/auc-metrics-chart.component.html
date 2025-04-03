@@ -1,12 +1,27 @@
 <div class="chart-container">
-  <div class="chart-title">Assets Under Custody Distribution</div>
-  <canvas #chartCanvas></canvas>
-  <div *ngIf="data" class="chart-total">
+  <div class="chart-header">
+    <div class="chart-title">AUC History</div>
+    <div class="time-range-selector">
+      <button 
+        *ngFor="let range of timeRanges" 
+        class="time-range-button" 
+        [class.active]="selectedTimeRange === range"
+        (click)="setTimeRange(range)">
+        {{range}}
+      </button>
+    </div>
+  </div>
+  
+  <div class="chart-wrapper">
+    <canvas #chartCanvas></canvas>
+  </div>
+  
+  <div class="chart-total" *ngIf="data">
     <span class="label">Total AUC:</span>
     <span class="value">${{data.totalAuc}}B</span>
-    <span *ngIf="data.growth !== undefined" class="growth" [ngClass]="data.growth >= 0 ? 'positive' : 'negative'">
-      <i [class]="'ri-arrow-' + (data.growth >= 0 ? 'up' : 'down') + '-line'"></i>
-      {{data.growth >= 0 ? '' : '('}}{{Math.abs(data.growth)}}%{{data.growth >= 0 ? '' : ')'}}
+    <span class="growth" [class.positive]="data.growth >= 0" [class.negative]="data.growth < 0">
+      <i [class]="'ri-arrow-' + ((data.growth >= 0) ? 'up' : 'down') + '-line'"></i>
+      {{Math.abs(data.growth)}}%
     </span>
   </div>
 </div>

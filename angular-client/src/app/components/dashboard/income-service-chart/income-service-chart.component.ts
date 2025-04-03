@@ -75,6 +75,14 @@ export class IncomeServiceChartComponent implements OnChanges, OnDestroy, AfterV
       options: {
         responsive: true,
         maintainAspectRatio: false,
+        layout: {
+          padding: {
+            top: 20,
+            bottom: 40,
+            left: 20,
+            right: 20
+          }
+        },
         plugins: {
           legend: {
             position: 'bottom',
@@ -82,6 +90,10 @@ export class IncomeServiceChartComponent implements OnChanges, OnDestroy, AfterV
               padding: 15,
               usePointStyle: true,
               pointStyle: 'rectRounded',
+              font: {
+                size: 11
+              },
+              boxWidth: 10
             }
           },
           tooltip: {
@@ -95,7 +107,7 @@ export class IncomeServiceChartComponent implements OnChanges, OnDestroy, AfterV
             }
           }
         },
-        cutout: '65%'
+        cutout: '55%'
       }
     });
   }

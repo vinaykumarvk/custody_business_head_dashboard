@@ -75,6 +75,14 @@ export class TradingVolumeChartComponent implements OnChanges, OnDestroy, AfterV
     gradient.addColorStop(0, 'rgba(36, 72, 165, 0.4)');
     gradient.addColorStop(1, 'rgba(36, 72, 165, 0.0)');
 
+    // Find the minimum volume to start y-axis from
+    const minVolume = Math.floor(Math.min(...volumes));
+    const maxVolume = Math.ceil(Math.max(...volumes));
+    
+    // Create a nice padding below the minimum (about 5% of the range)
+    const padding = Math.max(0.5, Math.floor((maxVolume - minVolume) * 0.05));
+    const yAxisMin = Math.max(0, minVolume - padding); // Ensure it doesn't go below 0
+
     this.chartInstance = new Chart(ctx, {
       type: 'line',
       data: {
@@ -100,7 +108,9 @@ export class TradingVolumeChartComponent implements OnChanges, OnDestroy, AfterV
         layout: {
           padding: {
             bottom: 15,
-            left: 10
+            left: 10,
+            right: 10,
+            top: 10
           }
         },
         scales: {
@@ -112,13 +122,14 @@ export class TradingVolumeChartComponent implements OnChanges, OnDestroy, AfterV
               maxRotation: 45,
               minRotation: 45,
               font: {
-                size: 11
+                size: 12
               },
               padding: 10
             }
           },
           y: {
-            beginAtZero: true,
+            beginAtZero: false, // Don't force axis to start at zero
+            min: yAxisMin, // Set the minimum value
             grid: {
               color: 'rgba(0, 0, 0, 0.05)'
             },
@@ -126,7 +137,10 @@ export class TradingVolumeChartComponent implements OnChanges, OnDestroy, AfterV
               callback: function(value) {
                 return '$' + value + 'B';
               },
-              padding: 10
+              padding: 10,
+              font: {
+                size: 12
+              }
             }
           }
         },

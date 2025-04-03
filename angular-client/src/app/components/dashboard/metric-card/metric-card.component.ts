@@ -20,6 +20,8 @@ export class MetricCardComponent {
   @Input() accentColor?: string;
   @Input() category?: 'customers' | 'revenue';
   @Input() colorClass?: string;
+  @Input() valuePrefix: string = '';
+  @Input() valueSuffix: string = '';
   
   // Make Math available to the template
   Math = Math;
