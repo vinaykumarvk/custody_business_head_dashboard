@@ -1,12 +1,12 @@
 .chart-container {
-  height: 300px;
+  height: 500px !important;
   width: 100%;
   position: relative;
   background-color: white;
   border-radius: 8px;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-  padding: 16px;
-  margin-bottom: 20px;
+  padding: 20px 20px 30px 20px !important;
+  margin-bottom: 25px;
 }
 
 .chart-title {

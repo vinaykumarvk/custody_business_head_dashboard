@@ -1,13 +1,108 @@
-:host {
-  .text-custodyBlue {
-    color: #2448a5;
-  }
+.metric-card {
+  position: relative;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.08);
+  padding: 16px;
+  display: flex;
+  justify-content: space-between;
+  height: 100%;
+  overflow: hidden;
+  transition: all 0.3s ease;
 
-  .text-custodyGray {
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.12);
+  }
+  
+  .blue-edge {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 6px;
+    background-color: #2448a5;
+    border-radius: 4px 0 0 4px;
+  }
+  
+  .card-content {
+    padding-left: 16px;
+    flex: 1;
+  }
+  
+  .card-title {
     color: #7b7b7b;
+    font-size: 14px;
+    font-weight: 500;
+    margin-bottom: 12px;
+    font-family: 'Roboto', sans-serif;
   }
-
-  .bg-custodyLightBlue {
-    background-color: #C6DBFC;
+  
+  .card-value {
+    color: #2448a5;
+    font-size: 28px;
+    font-weight: 600;
+    margin: 10px 0;
+    font-family: 'Roboto', sans-serif;
+  }
+  
+  .card-subtitle {
+    color: #7b7b7b;
+    font-size: 12px;
+    margin-top: 6px;
+    font-family: 'Roboto', sans-serif;
+  }
+  
+  .change-container {
+    display: flex;
+    align-items: center;
+    margin-top: 12px;
+  }
+  
+  .change-value {
+    display: flex;
+    align-items: center;
+    font-size: 14px;
+    font-weight: 600;
+    font-family: 'Roboto', sans-serif;
+    
+    i {
+      margin-right: 4px;
+    }
+    
+    &.positive {
+      color: #0ea569;
+    }
+    
+    &.negative {
+      color: #e63a3a;
+    }
+  }
+  
+  .change-period {
+    color: #7b7b7b;
+    font-size: 12px;
+    margin-left: 8px;
+    font-family: 'Roboto', sans-serif;
+  }
+  
+  .icon-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px;
+    background-color: rgba(198, 219, 252, 0.5);
+    border-radius: 12px;
+    transition: all 0.3s ease;
+    
+    i {
+      color: #2448a5;
+      font-size: 20px;
+    }
+    
+    &:hover {
+      transform: rotate(10deg);
+      background-color: rgba(198, 219, 252, 0.8);
+    }
   }
 }

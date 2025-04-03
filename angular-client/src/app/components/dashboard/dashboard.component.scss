@@ -4,12 +4,25 @@
   min-height: 100vh;
 }
 
-.dashboard-grid {
+.dashboard-section {
   display: flex;
   flex-direction: column;
   gap: 20px;
   max-width: 1400px;
-  margin: 0 auto;
+  margin: 0 auto 30px;
+  background-color: white;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.section-title {
+  font-size: 24px;
+  font-weight: 600;
+  color: #2448a5;
+  margin-bottom: 10px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #e5e7eb;
 }
 
 .metrics-section {
@@ -34,6 +47,11 @@
 
 .chart-card {
   width: 100%;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+  min-height: 500px !important;
   
   &.full-width {
     grid-column: 1 / -1;
@@ -52,7 +70,7 @@
 }
 
 .loading-chart {
-  height: 300px;
+  height: 450px !important;
 }
 
 .loading-spinner {
@@ -90,4 +108,25 @@
 
 .error-chart {
   height: 300px;
+}
+
+// Responsive adaptations
+@media (max-width: 1200px) {
+  .metrics-row {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  }
+  
+  .charts-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .dashboard-section {
+    padding: 15px;
+  }
+  
+  .section-title {
+    font-size: 20px;
+  }
 }

@@ -146,6 +146,43 @@ app.get('/api/customer-growth', async (req, res) => {
   }
 });
 
+// Latest new customers endpoint
+app.get('/api/latest-new-customers', async (req, res) => {
+  try {
+    // Get most recent record
+    const latestResult = await pool.query('SELECT * FROM customer_growth ORDER BY date DESC LIMIT 1');
+    
+    // Get previous month's record for comparison
+    const previousResult = await pool.query('SELECT * FROM customer_growth ORDER BY date DESC LIMIT 1 OFFSET 1');
+    
+    if (latestResult.rows.length === 0) {
+      return res.status(404).json({ message: 'No data found' });
+    }
+    
+    const latest = latestResult.rows[0];
+    let change = 0;
+    
+    if (previousResult.rows.length > 0) {
+      const previous = previousResult.rows[0];
+      // Calculate percentage change
+      if (previous.new_customers > 0) {
+        change = ((latest.new_customers - previous.new_customers) / previous.new_customers) * 100;
+      }
+    }
+    
+    res.json({
+      value: latest.new_customers,
+      change: parseFloat(change.toFixed(2))
+    });
+  } catch (error) {
+    console.error('Error fetching latest new customers:', error);
+    res.status(500).json({ 
+      message: 'Error fetching latest new customers',
+      error: error.message
+    });
+  }
+});
+
 // Customer segments endpoint
 app.get('/api/customer-segments', async (req, res) => {
   try {
@@ -265,11 +302,35 @@ app.get('/api/income-by-service', async (req, res) => {
 // Income history endpoint
 app.get('/api/income-history', async (req, res) => {
   try {
-    const result = await pool.query('SELECT * FROM income_history ORDER BY date DESC LIMIT 12');
-    const transformedData = result.rows.map(row => ({
-      ...toCamelCase(row),
-      createdAt: new Date()
-    }));
+    console.log('Fetching income history data...');
+    const result = await pool.query('SELECT * FROM income_history ORDER BY date DESC LIMIT 24');
+    
+    if (!result || !result.rows || result.rows.length === 0) {
+      console.log('No income history data found');
+      return res.json([]);
+    }
+    
+    console.log(`Retrieved ${result.rows.length} income history records`);
+    
+    // Log the first row to see its structure
+    if (result.rows.length > 0) {
+      console.log('Sample income history record:', result.rows[0]);
+    }
+    
+    const transformedData = result.rows.map(row => {
+      const transformed = toCamelCase(row);
+      
+      // Ensure income is a number
+      if (typeof transformed.income === 'string') {
+        transformed.income = parseFloat(transformed.income);
+      }
+      
+      return {
+        ...transformed,
+        createdAt: new Date()
+      };
+    });
+    
     res.json(transformedData);
   } catch (error) {
     console.error('Error fetching income history:', error);

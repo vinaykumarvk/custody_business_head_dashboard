@@ -88,13 +88,21 @@ export class TradingVolumeChartComponent implements OnChanges, OnDestroy, AfterV
             borderWidth: 2,
             fill: true,
             tension: 0.3,
-            pointBackgroundColor: '#2448a5'
+            pointBackgroundColor: '#2448a5',
+            pointRadius: 0,
+            pointHoverRadius: 4
           }
         ]
       },
       options: {
         responsive: true,
         maintainAspectRatio: false,
+        layout: {
+          padding: {
+            bottom: 15,
+            left: 10
+          }
+        },
         scales: {
           x: {
             grid: {
@@ -102,7 +110,11 @@ export class TradingVolumeChartComponent implements OnChanges, OnDestroy, AfterV
             },
             ticks: {
               maxRotation: 45,
-              minRotation: 45
+              minRotation: 45,
+              font: {
+                size: 11
+              },
+              padding: 10
             }
           },
           y: {
@@ -113,7 +125,8 @@ export class TradingVolumeChartComponent implements OnChanges, OnDestroy, AfterV
             ticks: {
               callback: function(value) {
                 return '$' + value + 'B';
-              }
+              },
+              padding: 10
             }
           }
         },
@@ -147,7 +160,9 @@ export class TradingVolumeChartComponent implements OnChanges, OnDestroy, AfterV
   }
 
   private formatDate(date: Date): string {
-    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-    return `${months[date.getMonth()]} ${date.getFullYear()}`;
+    // Format as MM/YY
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const year = date.getFullYear().toString().slice(2);
+    return `${month}/${year}`;
   }
 }

@@ -40,7 +40,13 @@ export class IncomeHistoryChartComponent implements OnChanges, OnDestroy, AfterV
   }
 
   private createChart() {
-    if (!this.chartCanvas || !this.data || this.data.length === 0) return;
+    if (!this.chartCanvas || !this.data || this.data.length === 0) {
+      console.error('Income history chart: Missing chart canvas or data', { 
+        canvasExists: !!this.chartCanvas, 
+        dataLength: this.data?.length 
+      });
+      return;
+    }
 
     if (this.chartInstance) {
       this.chartInstance.destroy();
@@ -48,6 +54,8 @@ export class IncomeHistoryChartComponent implements OnChanges, OnDestroy, AfterV
 
     const ctx = this.chartCanvas.nativeElement.getContext('2d');
     if (!ctx) return;
+
+    console.log('Income history data before processing:', JSON.stringify(this.data.slice(0, 2)));
 
     // Filter data based on selected time range
     const now = new Date();
@@ -67,8 +75,27 @@ export class IncomeHistoryChartComponent implements OnChanges, OnDestroy, AfterV
     // Sort data by date
     filteredData.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 
+    console.log('Income history filtered data:', JSON.stringify(filteredData.slice(0, 2)));
+
     const labels = filteredData.map(item => this.formatDate(new Date(item.date)));
-    const amounts = filteredData.map(item => typeof item.income === 'string' ? parseFloat(item.income) : item.income);
+    
+    // Ensure income values are properly parsed to numbers
+    const amounts = filteredData.map(item => {
+      // Handle different income data types
+      if (typeof item.income === 'string') {
+        return parseFloat(item.income);
+      } else if (typeof item.income === 'number') {
+        return item.income;
+      } else {
+        console.error('Invalid income value:', item.income);
+        return 0; // Default value for invalid data
+      }
+    });
+
+    console.log('Processed labels and amounts:', { 
+      labels: labels.slice(0, 2), 
+      amounts: amounts.slice(0, 2) 
+    });
 
     // Calculate gradient
     const gradient = ctx.createLinearGradient(0, 0, 0, 400);
@@ -95,6 +122,12 @@ export class IncomeHistoryChartComponent implements OnChanges, OnDestroy, AfterV
       options: {
         responsive: true,
         maintainAspectRatio: false,
+        layout: {
+          padding: {
+            bottom: 15,
+            left: 10
+          }
+        },
         scales: {
           x: {
             grid: {
@@ -102,18 +135,23 @@ export class IncomeHistoryChartComponent implements OnChanges, OnDestroy, AfterV
             },
             ticks: {
               maxRotation: 45,
-              minRotation: 45
+              minRotation: 45,
+              font: {
+                size: 11
+              },
+              padding: 10
             }
           },
           y: {
-            beginAtZero: true,
+            beginAtZero: false,
             grid: {
               color: 'rgba(0, 0, 0, 0.05)'
             },
             ticks: {
               callback: function(value) {
                 return '$' + value + 'M';
-              }
+              },
+              padding: 10
             }
           }
         },
@@ -147,7 +185,9 @@ export class IncomeHistoryChartComponent implements OnChanges, OnDestroy, AfterV
   }
 
   private formatDate(date: Date): string {
-    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-    return `${months[date.getMonth()]} ${date.getFullYear()}`;
+    // Format as MM/YY
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const year = date.getFullYear().toString().slice(2);
+    return `${month}/${year}`;
   }
 }

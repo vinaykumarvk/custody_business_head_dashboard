@@ -19,6 +19,10 @@ export class DashboardService {
     return this.http.get<interfaces.CustomerGrowth[]>(`${this.apiUrl}/customer-growth`);
   }
 
+  getLatestNewCustomers(): Observable<{value: number, change: number}> {
+    return this.http.get<{value: number, change: number}>(`${this.apiUrl}/latest-new-customers`);
+  }
+
   getCustomerSegments(): Observable<interfaces.CustomerSegment[]> {
     return this.http.get<interfaces.CustomerSegment[]>(`${this.apiUrl}/customer-segments`);
   }

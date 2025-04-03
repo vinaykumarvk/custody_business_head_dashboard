@@ -68,13 +68,27 @@ export class CustomerSegmentsChartComponent implements OnChanges, OnDestroy, Aft
       options: {
         responsive: true,
         maintainAspectRatio: false,
+        layout: {
+          padding: {
+            top: 20,
+            bottom: 20,
+            left: 20,
+            right: 20
+          }
+        },
         plugins: {
           legend: {
             position: 'bottom',
+            align: 'center',
             labels: {
-              padding: 15,
+              padding: 20,
               usePointStyle: true,
               pointStyle: 'rectRounded',
+              font: {
+                size: 13
+              },
+              boxWidth: 15,
+              boxHeight: 15
             }
           },
           tooltip: {
@@ -84,10 +98,17 @@ export class CustomerSegmentsChartComponent implements OnChanges, OnDestroy, Aft
                 const value = context.raw as number;
                 return `${label}: ${value.toFixed(1)}%`;
               }
-            }
+            },
+            titleFont: {
+              size: 14
+            },
+            bodyFont: {
+              size: 13
+            },
+            padding: 12
           }
         },
-        cutout: '65%'
+        cutout: '60%'
       }
     });
   }

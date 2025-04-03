@@ -1,5 +1,5 @@
 .chart-container {
-  height: 300px;
+  height: 450px !important;
   width: 100%;
   position: relative;
   background-color: white;
@@ -44,4 +44,10 @@
     background-color: #2448a5;
     color: white;
   }
+}
+
+.chart-wrapper {
+  position: relative;
+  height: calc(100% - 50px);
+  width: 100%;
 }

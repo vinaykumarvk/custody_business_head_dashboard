@@ -40,6 +40,7 @@ export class DashboardComponent implements OnInit {
   incomeByService: interfaces.IncomeByService[] = [];
   incomeHistory: interfaces.IncomeHistory[] = [];
   topCustomers: interfaces.TopCustomer[] = [];
+  latestNewCustomers: {value: number, change: number} | null = null;
   
   // Loading states
   loading = {
@@ -52,7 +53,8 @@ export class DashboardComponent implements OnInit {
     income: true,
     incomeByService: true,
     incomeHistory: true,
-    topCustomers: true
+    topCustomers: true,
+    latestNewCustomers: true
   };
 
   // Error states
@@ -66,7 +68,8 @@ export class DashboardComponent implements OnInit {
     income: false,
     incomeByService: false,
     incomeHistory: false,
-    topCustomers: false
+    topCustomers: false,
+    latestNewCustomers: false
   };
 
   constructor(private dashboardService: DashboardService) {}
@@ -85,6 +88,24 @@ export class DashboardComponent implements OnInit {
     this.loadIncome();
     this.loadIncomeHistory();
     this.loadTopCustomers();
+    this.loadLatestNewCustomers();
+  }
+
+  loadLatestNewCustomers(): void {
+    this.loading.latestNewCustomers = true;
+    this.error.latestNewCustomers = false;
+    
+    this.dashboardService.getLatestNewCustomers().subscribe({
+      next: (data) => {
+        this.latestNewCustomers = data;
+        this.loading.latestNewCustomers = false;
+      },
+      error: (err) => {
+        console.error('Error loading latest new customers', err);
+        this.loading.latestNewCustomers = false;
+        this.error.latestNewCustomers = true;
+      }
+    });
   }
 
   loadCustomerMetrics(): void {

@@ -65,9 +65,11 @@ export class CustomerGrowthChartComponent implements OnChanges, OnDestroy, After
       filteredData = this.data.filter(item => new Date(item.date) >= lastYear);
     }
 
+    // Sort data from earliest to latest date
+    filteredData.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+
     const labels = filteredData.map(item => this.formatDate(new Date(item.date)));
     const customersData = filteredData.map(item => item.customers);
-    const newCustomersData = filteredData.map(item => item.newCustomers);
 
     this.chartInstance = new Chart(ctx, {
       type: 'line',
@@ -82,23 +84,22 @@ export class CustomerGrowthChartComponent implements OnChanges, OnDestroy, After
             borderWidth: 2,
             fill: false,
             tension: 0.2,
-            pointBackgroundColor: '#2448a5'
-          },
-          {
-            label: 'New Customers',
-            data: newCustomersData,
-            borderColor: '#7b7b7b',
-            backgroundColor: 'rgba(123, 123, 123, 0.1)',
-            borderWidth: 2,
-            fill: false,
-            tension: 0.2,
-            pointBackgroundColor: '#7b7b7b'
+            pointRadius: 0,
+            pointHoverRadius: 4
           }
         ]
       },
       options: {
         responsive: true,
         maintainAspectRatio: false,
+        layout: {
+          padding: {
+            bottom: 40,
+            left: 20,
+            right: 20,
+            top: 20
+          }
+        },
         scales: {
           x: {
             grid: {
@@ -106,7 +107,14 @@ export class CustomerGrowthChartComponent implements OnChanges, OnDestroy, After
             },
             ticks: {
               maxRotation: 45,
-              minRotation: 45
+              minRotation: 45,
+              font: {
+                size: 12,
+                weight: 'bold'
+              },
+              padding: 15,
+              color: '#2448a5',
+              maxTicksLimit: 12
             }
           },
           y: {
@@ -115,7 +123,11 @@ export class CustomerGrowthChartComponent implements OnChanges, OnDestroy, After
               color: 'rgba(0, 0, 0, 0.05)'
             },
             ticks: {
-              precision: 0
+              precision: 0,
+              padding: 15,
+              font: {
+                size: 12
+              }
             }
           }
         },
@@ -123,6 +135,13 @@ export class CustomerGrowthChartComponent implements OnChanges, OnDestroy, After
           tooltip: {
             mode: 'index',
             intersect: false,
+            padding: 12,
+            titleFont: {
+              size: 14
+            },
+            bodyFont: {
+              size: 13
+            }
           },
           legend: {
             position: 'top',
@@ -130,7 +149,11 @@ export class CustomerGrowthChartComponent implements OnChanges, OnDestroy, After
             labels: {
               boxWidth: 12,
               usePointStyle: true,
-              pointStyle: 'circle'
+              pointStyle: 'circle',
+              font: {
+                size: 13
+              },
+              padding: 20
             }
           }
         },
@@ -150,7 +173,9 @@ export class CustomerGrowthChartComponent implements OnChanges, OnDestroy, After
   }
 
   private formatDate(date: Date): string {
-    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-    return `${months[date.getMonth()]} ${date.getFullYear()}`;
+    // Format as MM/YY
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const year = date.getFullYear().toString().slice(2);
+    return `${month}/${year}`;
   }
 }

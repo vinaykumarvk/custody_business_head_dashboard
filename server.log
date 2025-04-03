@@ -1,10 +1,1 @@
-file:///Users/n15318/Documents/cursor_projects/custody_business_head_dashboard/server.js:1
-const express = require('express');
-                ^
-
-ReferenceError: require is not defined in ES module scope, you can use import instead
-This file is being treated as an ES module because it has a '.js' file extension and '/Users/n15318/Documents/cursor_projects/custody_business_head_dashboard/package.json' contains "type": "module". To treat it as a CommonJS script, rename it to use the '.cjs' file extension.
-    at file:///Users/n15318/Documents/cursor_projects/custody_business_head_dashboard/server.js:1:17
-    at ModuleJob.run (node:internal/modules/esm/module_job:194:25)
-
-Node.js v18.18.0
+Port 5000 is already in use. Please try a different port or kill the existing process.
